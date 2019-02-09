@@ -9,6 +9,4 @@ public class SmartSchedulerPlatformApplication {
   public static void main(String[] args) {
     SpringApplication.run(SmartSchedulerPlatformApplication.class, args);
   }
-
 }
-
