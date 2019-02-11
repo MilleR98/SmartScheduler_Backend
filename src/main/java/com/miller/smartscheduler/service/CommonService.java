@@ -7,8 +7,6 @@ public interface CommonService<T> {
 
   Optional<T> find(String id);
 
-  T getOrFail(String id);
-
   List<T> findAll();
 
   void save(T object);

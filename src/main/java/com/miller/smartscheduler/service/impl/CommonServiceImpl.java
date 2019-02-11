@@ -1,6 +1,5 @@
 package com.miller.smartscheduler.service.impl;
 
-import com.miller.smartscheduler.exception.ContentNotFoundException;
 import com.miller.smartscheduler.service.CommonService;
 import java.util.List;
 import java.util.Optional;
@@ -16,12 +15,6 @@ public class CommonServiceImpl<T> implements CommonService<T> {
   public Optional<T> find(String id) {
 
     return mongoRepository.findById(id);
-  }
-
-  @Override
-  public T getOrFail(String id) {
-
-    return mongoRepository.findById(id).orElseThrow(ContentNotFoundException::new);
   }
 
   @Override

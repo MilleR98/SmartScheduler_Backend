@@ -1,8 +1,9 @@
 package com.miller.smartscheduler.service;
 
 import com.miller.smartscheduler.model.User;
+import java.util.Optional;
 
-public interface UserService {
+public interface UserService extends CommonService<User> {
 
-  User findByEmail(String email);
+  Optional<User> findByEmail(String email);
 }

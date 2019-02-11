@@ -1,5 +1,6 @@
 package com.miller.smartscheduler.model;
 
+import com.miller.smartscheduler.model.type.UserType;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -14,4 +15,5 @@ public class User {
   private String lastName;
   private String email;
   private String password;
+  private UserType userType;
 }

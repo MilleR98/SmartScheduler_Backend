@@ -1,4 +1,4 @@
-package com.miller.smartscheduler.exception;
+package com.miller.smartscheduler.error.exception;
 
 public class ContentNotFoundException extends RuntimeException {
 
