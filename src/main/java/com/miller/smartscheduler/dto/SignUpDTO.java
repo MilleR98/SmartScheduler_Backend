@@ -12,8 +12,11 @@ public class SignUpDTO {
   @NotBlank(message = "FirstName cannot be empty")
   private String firstName;
 
-  @NotBlank(message = "LastBame cannot be empty")
+  @NotBlank(message = "LastName cannot be empty")
   private String lastName;
+
+  @NotBlank(message = "Phone number cannot be empty")
+  private String phoneNumber;
 
   @NotBlank(message = "Email Cannot be blank")
   @Pattern(regexp = EMAIL_REGEX, message = "Should be valid email format")

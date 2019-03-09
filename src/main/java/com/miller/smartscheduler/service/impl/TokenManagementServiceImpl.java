@@ -40,8 +40,12 @@ public class TokenManagementServiceImpl implements TokenManagementService {
     byte[] apiKeySecretBytes = Base64.getEncoder().encode(secretKey.getBytes());
     Key signingKey = new SecretKeySpec(apiKeySecretBytes, signatureAlgorithm.getJcaName());
 
-    String token = Jwts.builder().setIssuedAt(new Date()).setExpiration(expiryDate)
-        .signWith(signatureAlgorithm, signingKey).claim("userClaims", customJwtClaims).compact();
+    String token = Jwts.builder()
+        .setIssuedAt(new Date())
+        .setExpiration(expiryDate)
+        .signWith(signatureAlgorithm, signingKey)
+        .claim("userClaims", customJwtClaims)
+        .compact();
 
     String refreshToken = RandomStringUtils.random(20, true, true);
 

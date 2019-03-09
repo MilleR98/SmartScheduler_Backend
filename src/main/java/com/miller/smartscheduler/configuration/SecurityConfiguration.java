@@ -34,7 +34,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         .exceptionHandling().authenticationEntryPoint((req, rsp, e) -> rsp.sendError(HttpServletResponse.SC_UNAUTHORIZED))
         .and()
         .authorizeRequests()
-        .antMatchers(HttpMethod.POST, "/sign-in", "/sign-up", "/refresh", "/logout").permitAll()
+        .antMatchers(HttpMethod.POST, "/auth/**").permitAll()
         .anyRequest()
         .authenticated()
         .and()

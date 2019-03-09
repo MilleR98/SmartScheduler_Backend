@@ -1,9 +1,11 @@
 package com.miller.smartscheduler.controller;
 
+import static com.miller.smartscheduler.error.CustomErrorCode.AUTH_ERROR;
 import static com.miller.smartscheduler.error.CustomErrorCode.ENTITY_VALIDATION_ERROR;
 import static com.miller.smartscheduler.error.CustomErrorCode.JWT_ERROR;
 
 import com.miller.smartscheduler.error.ErrorResponse;
+import com.miller.smartscheduler.error.exception.AuthException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureException;
@@ -59,5 +61,12 @@ public class ExceptionHandlerController {
     log.error(ex.getMessage());
 
     return new ResponseEntity<>(new ErrorResponse(ex.getMessage(), JWT_ERROR), HttpStatus.UNAUTHORIZED);
+  }
+
+  @ExceptionHandler(AuthException.class)
+  public ResponseEntity<ErrorResponse> authError(AuthException ex) {
+    log.error(ex.getMessage());
+
+    return new ResponseEntity<>(new ErrorResponse(ex.getMessage(), AUTH_ERROR), HttpStatus.UNAUTHORIZED);
   }
 }

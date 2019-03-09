@@ -50,6 +50,7 @@ public class CustomIdentityProviderImpl implements CustomIdentityProvider {
       userDetails.setEmail(user.getEmail());
       userDetails.setFirstName(user.getFirstName());
       userDetails.setLastName(user.getLastName());
+      response.setUserDetails(userDetails);
 
       return response;
     } else {
@@ -82,6 +83,7 @@ public class CustomIdentityProviderImpl implements CustomIdentityProvider {
     user.setEmail(signUpDTO.getEmail());
     user.setFirstName(signUpDTO.getFirstName());
     user.setLastName(signUpDTO.getLastName());
+    user.setPhoneNumber(signUpDTO.getPhoneNumber());
     user.setPassword(passwordEncoder.encode(signUpDTO.getPassword()));
     user.setUserType(UserType.SIMPLE_USER);
 
