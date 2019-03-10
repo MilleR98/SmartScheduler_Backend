@@ -1,7 +1,7 @@
-package com.miller.smartscheduler.repository;
+package com.miller.smartscheduler.security.repository;
 
-import com.miller.smartscheduler.dto.TokenPair;
-import com.miller.smartscheduler.model.TokenWrapper;
+import com.miller.smartscheduler.security.dto.TokenPair;
+import com.miller.smartscheduler.security.model.TokenWrapper;
 import java.util.Optional;
 
 public interface TokenRepository {

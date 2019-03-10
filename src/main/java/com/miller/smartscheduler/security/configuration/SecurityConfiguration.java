@@ -1,7 +1,7 @@
-package com.miller.smartscheduler.configuration;
+package com.miller.smartscheduler.security.configuration;
 
-import com.miller.smartscheduler.filter.JwtAuthorizationFilter;
-import com.miller.smartscheduler.security.TokenValidator;
+import com.miller.smartscheduler.security.filter.JwtAuthorizationFilter;
+import com.miller.smartscheduler.security.service.TokenValidator;
 import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

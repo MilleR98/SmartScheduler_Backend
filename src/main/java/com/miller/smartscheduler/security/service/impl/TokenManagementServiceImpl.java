@@ -1,10 +1,10 @@
-package com.miller.smartscheduler.service.impl;
+package com.miller.smartscheduler.security.service.impl;
 
-import com.miller.smartscheduler.dto.TokenPair;
-import com.miller.smartscheduler.model.CustomJwtClaims;
-import com.miller.smartscheduler.repository.TokenRepository;
-import com.miller.smartscheduler.security.TokenValidator;
-import com.miller.smartscheduler.service.TokenManagementService;
+import com.miller.smartscheduler.security.dto.TokenPair;
+import com.miller.smartscheduler.security.model.CustomJwtClaims;
+import com.miller.smartscheduler.security.repository.TokenRepository;
+import com.miller.smartscheduler.security.service.TokenValidator;
+import com.miller.smartscheduler.security.service.TokenManagementService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;

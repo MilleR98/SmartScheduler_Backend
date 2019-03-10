@@ -1,4 +1,4 @@
-package com.miller.smartscheduler.model;
+package com.miller.smartscheduler.security.model;
 
 import com.miller.smartscheduler.model.type.UserType;
 import lombok.Data;

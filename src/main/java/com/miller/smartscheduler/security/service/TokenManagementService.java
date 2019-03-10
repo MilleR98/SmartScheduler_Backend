@@ -1,7 +1,7 @@
-package com.miller.smartscheduler.service;
+package com.miller.smartscheduler.security.service;
 
-import com.miller.smartscheduler.dto.TokenPair;
-import com.miller.smartscheduler.model.CustomJwtClaims;
+import com.miller.smartscheduler.security.dto.TokenPair;
+import com.miller.smartscheduler.security.model.CustomJwtClaims;
 
 public interface TokenManagementService {
 

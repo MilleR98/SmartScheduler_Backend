@@ -1,4 +1,4 @@
-package com.miller.smartscheduler.util;
+package com.miller.smartscheduler.security;
 
 import java.util.Collections;
 import java.util.Enumeration;

@@ -1,11 +1,11 @@
-package com.miller.smartscheduler.filter;
+package com.miller.smartscheduler.security.filter;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
-import com.miller.smartscheduler.model.CustomJwtClaims;
-import com.miller.smartscheduler.security.TokenValidator;
-import com.miller.smartscheduler.util.MutableHttpServletRequest;
+import com.miller.smartscheduler.security.model.CustomJwtClaims;
+import com.miller.smartscheduler.security.service.TokenValidator;
+import com.miller.smartscheduler.security.MutableHttpServletRequest;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;

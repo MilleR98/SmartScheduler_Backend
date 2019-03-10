@@ -1,4 +1,4 @@
-package com.miller.smartscheduler.controller;
+package com.miller.smartscheduler.security.controller;
 
 import static com.miller.smartscheduler.error.CustomErrorCode.AUTH_ERROR;
 import static com.miller.smartscheduler.error.CustomErrorCode.ENTITY_VALIDATION_ERROR;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @Slf4j
 @RestControllerAdvice
-public class ExceptionHandlerController {
+public class AuthExceptionHandlerController {
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ResponseEntity<ErrorResponse> validationError(MethodArgumentNotValidException ex) {

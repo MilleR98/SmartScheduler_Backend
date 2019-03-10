@@ -1,4 +1,4 @@
-package com.miller.smartscheduler.dto;
+package com.miller.smartscheduler.security.dto;
 
 import lombok.Data;
 

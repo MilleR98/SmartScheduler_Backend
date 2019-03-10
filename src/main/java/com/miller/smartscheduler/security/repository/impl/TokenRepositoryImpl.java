@@ -1,11 +1,11 @@
-package com.miller.smartscheduler.repository.impl;
+package com.miller.smartscheduler.security.repository.impl;
 
 import static com.miller.smartscheduler.util.Constants.LOGOUT_TOKENS_CACHE_NAME;
 import static com.miller.smartscheduler.util.Constants.REFRESH_TOKENS_CACHE_NAME;
 
-import com.miller.smartscheduler.dto.TokenPair;
-import com.miller.smartscheduler.model.TokenWrapper;
-import com.miller.smartscheduler.repository.TokenRepository;
+import com.miller.smartscheduler.security.dto.TokenPair;
+import com.miller.smartscheduler.security.model.TokenWrapper;
+import com.miller.smartscheduler.security.repository.TokenRepository;
 import java.util.Optional;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;

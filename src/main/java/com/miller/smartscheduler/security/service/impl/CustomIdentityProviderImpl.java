@@ -1,19 +1,19 @@
-package com.miller.smartscheduler.security.impl;
+package com.miller.smartscheduler.security.service.impl;
 
 import static java.lang.String.format;
 
-import com.miller.smartscheduler.dto.SignInDTO;
-import com.miller.smartscheduler.dto.SignInResponse;
-import com.miller.smartscheduler.dto.SignUpDTO;
-import com.miller.smartscheduler.dto.TokenPair;
-import com.miller.smartscheduler.dto.UserDetails;
+import com.miller.smartscheduler.security.dto.SignInDTO;
+import com.miller.smartscheduler.security.dto.SignInResponse;
+import com.miller.smartscheduler.security.dto.SignUpDTO;
+import com.miller.smartscheduler.security.dto.TokenPair;
+import com.miller.smartscheduler.security.dto.UserDetails;
 import com.miller.smartscheduler.error.exception.AuthException;
 import com.miller.smartscheduler.error.exception.UserRegistrationException;
-import com.miller.smartscheduler.model.CustomJwtClaims;
+import com.miller.smartscheduler.security.model.CustomJwtClaims;
 import com.miller.smartscheduler.model.User;
 import com.miller.smartscheduler.model.type.UserType;
-import com.miller.smartscheduler.security.CustomIdentityProvider;
-import com.miller.smartscheduler.service.TokenManagementService;
+import com.miller.smartscheduler.security.service.CustomIdentityProvider;
+import com.miller.smartscheduler.security.service.TokenManagementService;
 import com.miller.smartscheduler.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

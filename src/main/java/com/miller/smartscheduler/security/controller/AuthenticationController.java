@@ -1,10 +1,10 @@
-package com.miller.smartscheduler.controller;
+package com.miller.smartscheduler.security.controller;
 
-import com.miller.smartscheduler.dto.TokenPair;
-import com.miller.smartscheduler.dto.SignInDTO;
-import com.miller.smartscheduler.dto.SignInResponse;
-import com.miller.smartscheduler.dto.SignUpDTO;
-import com.miller.smartscheduler.security.CustomIdentityProvider;
+import com.miller.smartscheduler.security.dto.TokenPair;
+import com.miller.smartscheduler.security.dto.SignInDTO;
+import com.miller.smartscheduler.security.dto.SignInResponse;
+import com.miller.smartscheduler.security.dto.SignUpDTO;
+import com.miller.smartscheduler.security.service.CustomIdentityProvider;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;

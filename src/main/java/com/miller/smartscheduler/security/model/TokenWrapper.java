@@ -1,4 +1,4 @@
-package com.miller.smartscheduler.model;
+package com.miller.smartscheduler.security.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
