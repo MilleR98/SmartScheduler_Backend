@@ -13,7 +13,6 @@ public class Event {
   private LocalDate date;
   private LocalTime startTime;
   private LocalTime endTime;
-  private Boolean scheduledNotificationsOn;
 
   private String description;
   private EventCategory eventCategory;

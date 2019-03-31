@@ -12,6 +12,5 @@ public class SimpleTask {
   private LocalDate date;
   private LocalTime startTime;
   private LocalTime endTime;
-  private Boolean scheduledNotificationsOn;
   private String userId;
 }
