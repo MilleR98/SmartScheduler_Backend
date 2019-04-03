@@ -1,13 +1,14 @@
 package com.miller.smartscheduler.model;
 
-import com.miller.smartscheduler.model.type.EventMemberType;
+import com.miller.smartscheduler.model.type.EventMemberPermission;
 import lombok.Data;
 
 @Data
 public class EventMember {
 
   private String id;
-  private String memberId;
+  private String userId;
   private String eventId;
-  private EventMemberType memberType;
+  private boolean isAccepted;
+  private EventMemberPermission eventMemberPermission;
 }

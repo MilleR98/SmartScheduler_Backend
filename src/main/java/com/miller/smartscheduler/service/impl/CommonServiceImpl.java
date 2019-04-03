@@ -1,5 +1,6 @@
 package com.miller.smartscheduler.service.impl;
 
+import com.miller.smartscheduler.error.exception.ContentNotFoundException;
 import com.miller.smartscheduler.service.CommonService;
 import java.util.List;
 import java.util.Optional;
@@ -30,14 +31,22 @@ public class CommonServiceImpl<T> implements CommonService<T> {
   }
 
   @Override
+  public void update(String id, T object) {
+
+    find(id).orElseThrow(() -> new ContentNotFoundException("Cannot update. Resource not found"));
+
+    mongoRepository.save(object);
+  }
+
+  @Override
   public T saveAndReturn(T object) {
 
     return mongoRepository.save(object);
   }
 
   @Override
-  public void remove(T object) {
+  public void remove(String id) {
 
-    mongoRepository.delete(object);
+    mongoRepository.deleteById(id);
   }
 }

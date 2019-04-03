@@ -1,17 +1,16 @@
-package com.miller.smartscheduler.model;
+package com.miller.smartscheduler.model.dto;
 
 import com.miller.smartscheduler.model.type.ReminderType;
-import java.time.LocalDate;
+import com.miller.smartscheduler.model.type.SubtaskStatus;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.Data;
 
 @Data
-public class SimpleTask {
+public class TaskPreviewDTO {
 
-  private String id;
   private String name;
   private ReminderType reminderType;
-  private LocalDateTime reminderTime;
   private LocalDateTime deadlineDate;
-  private String userId;
+  private List<SubtaskStatus> subtaskStatuses;
 }

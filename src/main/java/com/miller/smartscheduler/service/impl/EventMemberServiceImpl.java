@@ -1,8 +1,10 @@
 package com.miller.smartscheduler.service.impl;
 
 import com.miller.smartscheduler.model.EventMember;
+import com.miller.smartscheduler.model.type.EventMemberPermission;
 import com.miller.smartscheduler.repository.EventMemberRepository;
 import com.miller.smartscheduler.service.EventMemberService;
+import java.util.List;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -13,5 +15,35 @@ public class EventMemberServiceImpl extends CommonServiceImpl<EventMember> imple
   public EventMemberServiceImpl(EventMemberRepository eventMemberRepository) {
     super(eventMemberRepository);
     this.eventMemberRepository = eventMemberRepository;
+  }
+
+  @Override
+  public List<EventMember> findAllByUserId(String memeberId) {
+
+    return eventMemberRepository.findAllByUserId(memeberId);
+  }
+
+  @Override
+  public List<EventMember> findAllEventId(String eventId) {
+
+    return eventMemberRepository.findAllByEventId(eventId);
+  }
+
+  @Override
+  public void removeAllByEventId(String eventId) {
+
+    eventMemberRepository.removeAllByEventId(eventId);
+  }
+
+  @Override
+  public List<EventMember> findByEventIdAndMemberPermission(String eventId, EventMemberPermission eventMemberPermission) {
+
+    return eventMemberRepository.findByEventIdAndEventMemberPermission(eventId, eventMemberPermission);
+  }
+
+  @Override
+  public EventMember findByEventAndUser(String eventId, String userId) {
+
+    return eventMemberRepository.findByEventIdAndUserId(eventId, userId);
   }
 }

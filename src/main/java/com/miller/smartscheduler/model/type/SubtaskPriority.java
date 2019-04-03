@@ -1,6 +1,6 @@
 package com.miller.smartscheduler.model.type;
 
-public enum PointPriority {
+public enum SubtaskPriority {
 
   HIGH,
   MEDIUM,

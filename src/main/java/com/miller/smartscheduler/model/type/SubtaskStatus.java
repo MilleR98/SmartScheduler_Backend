@@ -1,6 +1,6 @@
 package com.miller.smartscheduler.model.type;
 
-public enum PointStatus {
+public enum SubtaskStatus {
 
   COMPLETED,
   REMOVED,

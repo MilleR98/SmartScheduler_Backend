@@ -1,6 +1,6 @@
 package com.miller.smartscheduler.model.type;
 
-public enum EventMemberType {
+public enum EventMemberPermission {
 
   OWNER,
   EDITOR,

@@ -11,7 +11,9 @@ public interface CommonService<T> {
 
   void save(T object);
 
+  void update(String id, T object);
+
   T saveAndReturn(T object);
 
-  void remove(T object);
+  void remove(String id);
 }

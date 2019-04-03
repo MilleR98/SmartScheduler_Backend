@@ -9,5 +9,6 @@ public class Challenge {
   private String id;
   private String name;
   private ChallengeStatus status;
+  private String startTime;
   private String userId;
 }
