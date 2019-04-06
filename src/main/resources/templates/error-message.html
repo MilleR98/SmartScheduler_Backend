@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+</head>
+<body>
+<table>
+  <tbody>
+  <tr>
+    <td style="color:#666">Phone:</td>
+    <td><span th:text="${errorReport.brand + errorReport.phoneModel}"></span></td>
+  </tr>
+  <tr>
+    <td style="color:#666">Android version:</td>
+    <td><span th:text="${errorReport.androidVersion}"></span></td>
+  </tr>
+  <tr>
+    <td style="color:#666">App start date:</td>
+    <td><span th:text="${errorReport.appStartDate}"></span></td>
+  </tr>
+  <tr>
+    <td style="color:#666">App crash date:</td>
+    <td><span th:text="${errorReport.appCrashDate}"></span></td>
+  </tr>
+  </tbody>
+</table>
+
+<h3>Stacktrace</h3>
+<p><span th:utext="${#strings.replace(#strings.escapeXml(errorReport.exceptionStackTrace),'&#10;','&lt;br&gt;')}"></span></p>
+</body>
+</html>
