@@ -10,7 +10,8 @@ public class Notification {
   private String id;
   private String userId;
   private String content;
-  private Boolean seen;
+  private String title;
+  private boolean seen;
   private LocalDateTime createdAt;
   private NotificationType notificationType;
 }
