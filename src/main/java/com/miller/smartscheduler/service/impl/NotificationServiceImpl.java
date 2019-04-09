@@ -30,14 +30,23 @@ public class NotificationServiceImpl extends CommonServiceImpl<Notification> imp
   @Override
   public void registerUserDeviceFcmToken(DeviceFcmTokenDTO deviceFcmTokenDTO, String userId) {
 
-    if (userDeviceInfoService.findByDeviceIdAndUserId(deviceFcmTokenDTO.getDeviceId(), userId).isEmpty()) {
+    userDeviceInfoService.findByDeviceIdAndUserId(deviceFcmTokenDTO.getDeviceId(), userId)
+        .ifPresentOrElse(userDeviceInfo -> updateDeviceFcmToken(userDeviceInfo, deviceFcmTokenDTO), () -> createNewDeviceInfo(deviceFcmTokenDTO, userId));
 
-      UserDeviceInfo userDeviceInfo = new UserDeviceInfo();
-      userDeviceInfo.setUserId(userId);
-      userDeviceInfo.setDeviceFcmToken(deviceFcmTokenDTO.getDeviceFcmToken());
-      userDeviceInfo.setDeviceId(deviceFcmTokenDTO.getDeviceId());
+  }
 
-      userDeviceInfoService.save(userDeviceInfo);
-    }
+  private void updateDeviceFcmToken(UserDeviceInfo userDeviceInfo, DeviceFcmTokenDTO deviceFcmTokenDTO) {
+    userDeviceInfo.setDeviceFcmToken(deviceFcmTokenDTO.getDeviceFcmToken());
+
+    userDeviceInfoService.save(userDeviceInfo);
+  }
+
+  private void createNewDeviceInfo(DeviceFcmTokenDTO deviceFcmTokenDTO, String userId) {
+    UserDeviceInfo userDeviceInfo = new UserDeviceInfo();
+    userDeviceInfo.setUserId(userId);
+    userDeviceInfo.setDeviceFcmToken(deviceFcmTokenDTO.getDeviceFcmToken());
+    userDeviceInfo.setDeviceId(deviceFcmTokenDTO.getDeviceId());
+
+    userDeviceInfoService.save(userDeviceInfo);
   }
 }

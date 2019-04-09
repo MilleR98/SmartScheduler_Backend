@@ -10,6 +10,6 @@ public class Subtask {
   private String id;
   private String name;
   private SubtaskPriority priority;
-  private SubtaskStatus subtaskStatus;
+  private SubtaskStatus subtaskStatus = SubtaskStatus.NEW;
   private String taskId;
 }

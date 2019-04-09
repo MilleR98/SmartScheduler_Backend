@@ -3,6 +3,8 @@ package com.miller.smartscheduler.controller;
 import com.miller.smartscheduler.error.exception.ContentNotFoundException;
 import com.miller.smartscheduler.model.SimpleTask;
 import com.miller.smartscheduler.model.Subtask;
+import com.miller.smartscheduler.model.dto.CreateTaskDTO;
+import com.miller.smartscheduler.model.dto.TaskPreviewDTO;
 import com.miller.smartscheduler.service.SimpleTaskService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +33,12 @@ public class SimpleTaskController {
     return simpleTaskService.getUserTasks(userId);
   }
 
+  @GetMapping("/previews")
+  public List<TaskPreviewDTO> getUserTaskPreviews(@RequestHeader("userId") String userId) {
+
+    return simpleTaskService.getUserTaskPreviews(userId);
+  }
+
   @GetMapping("/{id}")
   public SimpleTask getTaskInfo(@PathVariable("id") String id) {
 
@@ -38,10 +46,9 @@ public class SimpleTaskController {
   }
 
   @PostMapping
-  public ResponseEntity createTask(@RequestBody SimpleTask simpleTask, @RequestHeader("userId") String userId) {
+  public ResponseEntity createTask(@RequestBody CreateTaskDTO createTaskDTO, @RequestHeader("userId") String userId) {
 
-    simpleTask.setUserId(userId);
-    simpleTaskService.save(simpleTask);
+    simpleTaskService.save(createTaskDTO, userId);
 
     return new ResponseEntity(HttpStatus.OK);
   }
