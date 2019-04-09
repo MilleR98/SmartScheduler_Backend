@@ -6,12 +6,14 @@ import java.util.List;
 import lombok.Data;
 
 @Data
-public class CreateTaskDTO {
+public class TaskInfoDTO {
 
+  private String id;
   private String title;
   private String description;
   private ReminderType reminderType;
   private String reminderTime;
   private String deadlineDate;
+  private String createdAt;
   private List<Subtask> subtaskList;
 }

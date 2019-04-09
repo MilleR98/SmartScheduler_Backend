@@ -4,6 +4,7 @@ import com.miller.smartscheduler.error.exception.ContentNotFoundException;
 import com.miller.smartscheduler.model.SimpleTask;
 import com.miller.smartscheduler.model.Subtask;
 import com.miller.smartscheduler.model.dto.CreateTaskDTO;
+import com.miller.smartscheduler.model.dto.TaskInfoDTO;
 import com.miller.smartscheduler.model.dto.TaskPreviewDTO;
 import com.miller.smartscheduler.service.SimpleTaskService;
 import java.util.List;
@@ -40,9 +41,9 @@ public class SimpleTaskController {
   }
 
   @GetMapping("/{id}")
-  public SimpleTask getTaskInfo(@PathVariable("id") String id) {
+  public TaskInfoDTO getTaskInfo(@PathVariable("id") String id) {
 
-    return simpleTaskService.find(id).orElseThrow(ContentNotFoundException::new);
+    return simpleTaskService.getTaskInfo(id);
   }
 
   @PostMapping

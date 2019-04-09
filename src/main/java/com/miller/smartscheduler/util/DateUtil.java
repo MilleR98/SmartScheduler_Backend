@@ -2,9 +2,12 @@ package com.miller.smartscheduler.util;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 public class DateUtil {
+
+  public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
   public static LocalDateTime convertToLocalDateTime(Date dateToConvert) {
 

@@ -9,7 +9,7 @@ import lombok.Data;
 public class TaskPreviewDTO {
 
   private String title;
-  private Date deadlineDate;
-  private Date createdAt;
+  private String deadlineDate;
+  private String createdAt;
   private List<SubtaskStatus> subtaskStatuses;
 }

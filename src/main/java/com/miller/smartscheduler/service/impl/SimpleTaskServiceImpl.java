@@ -1,11 +1,12 @@
 package com.miller.smartscheduler.service.impl;
 
-import static com.miller.smartscheduler.util.DateUtil.convertToDate;
-import static com.miller.smartscheduler.util.DateUtil.convertToLocalDateTime;
+import static com.miller.smartscheduler.util.DateUtil.DATE_TIME_FORMATTER;
 
+import com.miller.smartscheduler.error.exception.ContentNotFoundException;
 import com.miller.smartscheduler.model.SimpleTask;
 import com.miller.smartscheduler.model.Subtask;
 import com.miller.smartscheduler.model.dto.CreateTaskDTO;
+import com.miller.smartscheduler.model.dto.TaskInfoDTO;
 import com.miller.smartscheduler.model.dto.TaskPreviewDTO;
 import com.miller.smartscheduler.model.type.SubtaskStatus;
 import com.miller.smartscheduler.repository.SimpleTaskRepository;
@@ -41,8 +42,8 @@ public class SimpleTaskServiceImpl extends CommonServiceImpl<SimpleTask> impleme
   @Override
   public void save(CreateTaskDTO createTaskDTO, String userId) {
 
-    LocalDateTime deadlineDate = convertToLocalDateTime(createTaskDTO.getDeadlineDate());
-    LocalDateTime reminderTime = convertToLocalDateTime(createTaskDTO.getReminderTime());
+    LocalDateTime deadlineDate = LocalDateTime.parse(createTaskDTO.getDeadlineDate());
+    LocalDateTime reminderTime = LocalDateTime.parse(createTaskDTO.getReminderTime());
 
     SimpleTask simpleTask = new SimpleTask();
     simpleTask.setUserId(userId);
@@ -71,10 +72,28 @@ public class SimpleTaskServiceImpl extends CommonServiceImpl<SimpleTask> impleme
         .collect(Collectors.toList());
   }
 
+  @Override
+  public TaskInfoDTO getTaskInfo(String id) {
+    SimpleTask simpleTask = find(id).orElseThrow(() -> new ContentNotFoundException("Canot found task info"));
+    List<Subtask> subtaskList = subtaskService.getSubtaskByTaskId(simpleTask.getId());
+
+    TaskInfoDTO taskInfo = new TaskInfoDTO();
+    taskInfo.setDeadlineDate(simpleTask.getDeadlineDate().withSecond(0).withNano(0).format(DATE_TIME_FORMATTER));
+    taskInfo.setCreatedAt(simpleTask.getCreatedAt().withSecond(0).withNano(0).format(DATE_TIME_FORMATTER));
+    taskInfo.setReminderTime(simpleTask.getCreatedAt().withSecond(0).withNano(0).format(DATE_TIME_FORMATTER));
+    taskInfo.setReminderType(simpleTask.getReminderType());
+    taskInfo.setId(simpleTask.getId());
+    taskInfo.setTitle(simpleTask.getTitle());
+    taskInfo.setDescription(simpleTask.getDescription());
+    taskInfo.setSubtaskList(subtaskList);
+
+    return taskInfo;
+  }
+
   private TaskPreviewDTO mapToPreview(SimpleTask simpleTask) {
     TaskPreviewDTO taskPreviewDTO = new TaskPreviewDTO();
-    taskPreviewDTO.setDeadlineDate(convertToDate(simpleTask.getDeadlineDate()));
-    taskPreviewDTO.setCreatedAt(convertToDate(simpleTask.getCreatedAt()));
+    taskPreviewDTO.setDeadlineDate(simpleTask.getDeadlineDate().withSecond(0).withNano(0).format(DATE_TIME_FORMATTER));
+    taskPreviewDTO.setCreatedAt(simpleTask.getCreatedAt().withSecond(0).withNano(0).format(DATE_TIME_FORMATTER));
     taskPreviewDTO.setTitle(simpleTask.getTitle());
 
     List<SubtaskStatus> subtaskStatuses = subtaskService.getSubtaskByTaskId(simpleTask.getId()).stream()
