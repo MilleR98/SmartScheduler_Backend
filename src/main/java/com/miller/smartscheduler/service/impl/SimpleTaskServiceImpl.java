@@ -42,13 +42,10 @@ public class SimpleTaskServiceImpl extends CommonServiceImpl<SimpleTask> impleme
   @Override
   public void save(CreateTaskDTO createTaskDTO, String userId) {
 
-    LocalDateTime deadlineDate = LocalDateTime.parse(createTaskDTO.getDeadlineDate());
-    LocalDateTime reminderTime = LocalDateTime.parse(createTaskDTO.getReminderTime());
-
     SimpleTask simpleTask = new SimpleTask();
     simpleTask.setUserId(userId);
-    simpleTask.setDeadlineDate(deadlineDate);
-    simpleTask.setReminderTime(reminderTime);
+    simpleTask.setDeadlineDate(createTaskDTO.getDeadlineDate());
+    simpleTask.setReminderTime(createTaskDTO.getReminderTime());
     simpleTask.setReminderType(createTaskDTO.getReminderType());
     simpleTask.setTitle(createTaskDTO.getTitle());
     simpleTask.setDescription(createTaskDTO.getDescription());
@@ -78,9 +75,9 @@ public class SimpleTaskServiceImpl extends CommonServiceImpl<SimpleTask> impleme
     List<Subtask> subtaskList = subtaskService.getSubtaskByTaskId(simpleTask.getId());
 
     TaskInfoDTO taskInfo = new TaskInfoDTO();
-    taskInfo.setDeadlineDate(simpleTask.getDeadlineDate().withSecond(0).withNano(0).format(DATE_TIME_FORMATTER));
-    taskInfo.setCreatedAt(simpleTask.getCreatedAt().withSecond(0).withNano(0).format(DATE_TIME_FORMATTER));
-    taskInfo.setReminderTime(simpleTask.getCreatedAt().withSecond(0).withNano(0).format(DATE_TIME_FORMATTER));
+    taskInfo.setDeadlineDate(simpleTask.getDeadlineDate().withSecond(0).withNano(0));
+    taskInfo.setCreatedAt(simpleTask.getCreatedAt().withSecond(0).withNano(0));
+    taskInfo.setReminderTime(simpleTask.getCreatedAt().withSecond(0).withNano(0));
     taskInfo.setReminderType(simpleTask.getReminderType());
     taskInfo.setId(simpleTask.getId());
     taskInfo.setTitle(simpleTask.getTitle());
@@ -92,8 +89,8 @@ public class SimpleTaskServiceImpl extends CommonServiceImpl<SimpleTask> impleme
 
   private TaskPreviewDTO mapToPreview(SimpleTask simpleTask) {
     TaskPreviewDTO taskPreviewDTO = new TaskPreviewDTO();
-    taskPreviewDTO.setDeadlineDate(simpleTask.getDeadlineDate().withSecond(0).withNano(0).format(DATE_TIME_FORMATTER));
-    taskPreviewDTO.setCreatedAt(simpleTask.getCreatedAt().withSecond(0).withNano(0).format(DATE_TIME_FORMATTER));
+    taskPreviewDTO.setDeadlineDate(simpleTask.getDeadlineDate().withSecond(0).withNano(0));
+    taskPreviewDTO.setCreatedAt(simpleTask.getCreatedAt().withSecond(0).withNano(0));
     taskPreviewDTO.setTitle(simpleTask.getTitle());
 
     List<SubtaskStatus> subtaskStatuses = subtaskService.getSubtaskByTaskId(simpleTask.getId()).stream()
