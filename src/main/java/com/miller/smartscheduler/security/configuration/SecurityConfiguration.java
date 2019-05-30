@@ -36,6 +36,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         .authorizeRequests()
         .antMatchers(HttpMethod.POST, "/auth/**").permitAll()
         .antMatchers(HttpMethod.POST, "/error/report").permitAll()
+        .antMatchers(HttpMethod.POST, "/events/email-invitation/decline").permitAll()
+        .antMatchers(HttpMethod.POST, "/events/email-invitation/accept").permitAll()
         .anyRequest()
         .authenticated()
         .and()

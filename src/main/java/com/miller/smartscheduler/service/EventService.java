@@ -4,8 +4,6 @@ import com.miller.smartscheduler.model.Event;
 import com.miller.smartscheduler.model.dto.EventDTO;
 import com.miller.smartscheduler.model.dto.EventMemberDTO;
 import com.miller.smartscheduler.model.dto.EventPreviewDTO;
-import com.miller.smartscheduler.model.type.EventMemberPermission;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -19,5 +17,15 @@ public interface EventService extends CommonService<Event> {
 
   List<EventPreviewDTO> findUserEventsPreview(String userId, LocalDateTime from, LocalDateTime to);
 
-  void inviteMemberToEvent(String eventId, EventMemberDTO eventMemberDTO);
+  void inviteMemberToEvent(String eventId, String ownerId, EventMemberDTO eventMemberDTO);
+
+  void declineEventEmailInvitation(String eventId, String code, String time, String email);
+
+  void acceptEventEmailInvitation(String eventId, String code, String time, String email);
+
+  void notifyEventMembers(String eventId, String msgContent);
+
+  void declineEventInvitation(String eventId, String userId);
+
+  void acceptEventInvitation(String eventId, String userId);
 }

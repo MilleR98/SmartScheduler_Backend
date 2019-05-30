@@ -1,7 +1,5 @@
 package com.miller.smartscheduler.service.impl;
 
-import static com.miller.smartscheduler.util.DateUtil.DATE_TIME_FORMATTER;
-
 import com.miller.smartscheduler.error.exception.ContentNotFoundException;
 import com.miller.smartscheduler.model.SimpleTask;
 import com.miller.smartscheduler.model.Subtask;
@@ -13,7 +11,6 @@ import com.miller.smartscheduler.repository.SimpleTaskRepository;
 import com.miller.smartscheduler.service.FirebaseMessagingService;
 import com.miller.smartscheduler.service.SimpleTaskService;
 import com.miller.smartscheduler.service.SubtaskService;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;

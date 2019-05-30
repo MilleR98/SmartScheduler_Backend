@@ -12,6 +12,6 @@ public class Notification {
   private String content;
   private String title;
   private boolean seen;
-  private LocalDateTime createdAt;
+  private LocalDateTime createdAt = LocalDateTime.now();
   private NotificationType notificationType;
 }

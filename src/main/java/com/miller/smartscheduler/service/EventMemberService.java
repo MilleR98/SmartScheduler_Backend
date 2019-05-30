@@ -8,7 +8,7 @@ public interface EventMemberService extends CommonService<EventMember> {
 
   List<EventMember> findAllByUserId(String memeberId);
 
-  List<EventMember> findAllEventId(String eventId);
+  List<EventMember> findAllByEventId(String eventId);
 
   void removeAllByEventId(String eventId);
 

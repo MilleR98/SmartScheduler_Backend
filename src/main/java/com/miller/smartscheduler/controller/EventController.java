@@ -49,9 +49,46 @@ public class EventController {
   }
 
   @PostMapping("/{id}/invite")
-  public void inviteMemberToEvent(@PathVariable("id") String eventId, @RequestBody EventMemberDTO eventMemberDTO) {
+  public void inviteMemberToEvent(@PathVariable("id") String eventId, @RequestHeader("userId") String userId, @RequestBody EventMemberDTO eventMemberDTO) {
 
-    eventService.inviteMemberToEvent(eventId, eventMemberDTO);
+    eventService.inviteMemberToEvent(eventId, userId, eventMemberDTO);
+  }
+
+  @PostMapping("/email-invitation/decline")
+  public void declineInvitation(@RequestParam("eventId") String eventId,
+      @RequestParam("code") String code,
+      @RequestParam("time") String time,
+      @RequestParam("email") String email) {
+
+    eventService.declineEventEmailInvitation(eventId, code, time, email);
+  }
+
+  @PostMapping("/email-invitation/accept")
+  public void acceptInvitation(@RequestParam("eventId") String eventId,
+      @RequestParam("code") String code,
+      @RequestParam("time") String time,
+      @RequestParam("email") String email) {
+
+    eventService.acceptEventEmailInvitation(eventId, code, time, email);
+  }
+
+  @PostMapping("{id}/invitation/decline")
+  public void declineInvitation(@PathVariable("id") String eventId, @RequestHeader("userId") String userId) {
+
+    eventService.declineEventInvitation(eventId, userId);
+  }
+
+  @PostMapping("/{id}/invitation/accept")
+  public void acceptInvitation(@PathVariable("id") String eventId, @RequestHeader("userId") String userId) {
+
+    eventService.acceptEventInvitation(eventId, userId);
+  }
+
+  @PostMapping("/{id}/notify-members")
+  public void notifyEventMembers(@PathVariable("id") String eventId,
+      @RequestBody() String msgContent) {
+
+    eventService.notifyEventMembers(eventId, msgContent);
   }
 
   @PostMapping

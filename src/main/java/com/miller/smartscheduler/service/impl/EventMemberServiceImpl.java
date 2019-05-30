@@ -18,13 +18,13 @@ public class EventMemberServiceImpl extends CommonServiceImpl<EventMember> imple
   }
 
   @Override
-  public List<EventMember> findAllByUserId(String memeberId) {
+  public List<EventMember> findAllByUserId(String memberId) {
 
-    return eventMemberRepository.findAllByUserId(memeberId);
+    return eventMemberRepository.findAllByUserId(memberId);
   }
 
   @Override
-  public List<EventMember> findAllEventId(String eventId) {
+  public List<EventMember> findAllByEventId(String eventId) {
 
     return eventMemberRepository.findAllByEventId(eventId);
   }
