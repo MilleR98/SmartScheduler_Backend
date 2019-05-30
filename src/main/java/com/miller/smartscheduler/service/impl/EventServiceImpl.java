@@ -37,6 +37,8 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
 @Slf4j
 @Service
@@ -50,11 +52,12 @@ public class EventServiceImpl extends CommonServiceImpl<Event> implements EventS
   private final FirebaseMessagingService firebaseMessagingService;
   private final EmailService emailService;
   private final NotificationService notificationService;
+  private final TemplateEngine templateEngine;
 
   public EventServiceImpl(EventRepository eventRepository, EventMemberService eventMemberService,
       EventLocationService eventLocationService,
       UserService userService, InvitationService invitationService, FirebaseMessagingService firebaseMessagingService,
-      EmailService emailService, NotificationService notificationService) {
+      EmailService emailService, NotificationService notificationService, TemplateEngine templateEngine) {
     super(eventRepository);
     this.eventRepository = eventRepository;
     this.eventMemberService = eventMemberService;
@@ -64,6 +67,7 @@ public class EventServiceImpl extends CommonServiceImpl<Event> implements EventS
     this.firebaseMessagingService = firebaseMessagingService;
     this.emailService = emailService;
     this.notificationService = notificationService;
+    this.templateEngine = templateEngine;
   }
 
   @Override
@@ -214,7 +218,7 @@ public class EventServiceImpl extends CommonServiceImpl<Event> implements EventS
   }
 
   @Override
-  public void declineEventEmailInvitation(String eventId, String code, String time, String email) {
+  public String declineEventEmailInvitation(String eventId, String code, String time, String email) {
 
     User member = userService.findByEmail(email).orElseThrow(ContentNotFoundException::new);
     String eventMemberId = eventMemberService.findByEventAndUser(eventId, member.getUserId()).getId();
@@ -230,6 +234,13 @@ public class EventServiceImpl extends CommonServiceImpl<Event> implements EventS
 
       throw new BadRequestException("Link is not active");
     }
+
+    Context context = new Context();
+    context.setVariables(new HashMap<>() {{
+      put("eventName", eventName);
+    }});
+
+    return templateEngine.process("invitation-declined", context);
   }
 
   private void declineInvitation(User member, String eventMemberId, String eventOwnerId, String eventName) {
@@ -249,7 +260,7 @@ public class EventServiceImpl extends CommonServiceImpl<Event> implements EventS
   }
 
   @Override
-  public void acceptEventEmailInvitation(String eventId, String code, String time, String email) {
+  public String acceptEventEmailInvitation(String eventId, String code, String time, String email) {
 
     User member = userService.findByEmail(email).orElseThrow(ContentNotFoundException::new);
     EventMember eventMember = eventMemberService.findByEventAndUser(eventId, member.getUserId());
@@ -266,6 +277,13 @@ public class EventServiceImpl extends CommonServiceImpl<Event> implements EventS
 
       throw new BadRequestException("Link is not active");
     }
+
+    Context context = new Context();
+    context.setVariables(new HashMap<>() {{
+      put("eventName", event.getName());
+    }});
+
+    return templateEngine.process("invitation-accepted", context);
   }
 
   @Override

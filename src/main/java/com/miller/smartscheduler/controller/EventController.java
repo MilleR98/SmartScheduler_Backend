@@ -55,21 +55,21 @@ public class EventController {
   }
 
   @PostMapping("/email-invitation/decline")
-  public void declineInvitation(@RequestParam("eventId") String eventId,
+  public String declineInvitation(@RequestParam("eventId") String eventId,
       @RequestParam("code") String code,
       @RequestParam("time") String time,
       @RequestParam("email") String email) {
 
-    eventService.declineEventEmailInvitation(eventId, code, time, email);
+    return eventService.declineEventEmailInvitation(eventId, code, time, email);
   }
 
   @PostMapping("/email-invitation/accept")
-  public void acceptInvitation(@RequestParam("eventId") String eventId,
+  public String acceptInvitation(@RequestParam("eventId") String eventId,
       @RequestParam("code") String code,
       @RequestParam("time") String time,
       @RequestParam("email") String email) {
 
-    eventService.acceptEventEmailInvitation(eventId, code, time, email);
+    return eventService.acceptEventEmailInvitation(eventId, code, time, email);
   }
 
   @PostMapping("{id}/invitation/decline")

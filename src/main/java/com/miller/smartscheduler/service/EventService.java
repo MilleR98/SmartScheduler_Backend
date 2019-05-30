@@ -19,9 +19,9 @@ public interface EventService extends CommonService<Event> {
 
   void inviteMemberToEvent(String eventId, String ownerId, EventMemberDTO eventMemberDTO);
 
-  void declineEventEmailInvitation(String eventId, String code, String time, String email);
+  String declineEventEmailInvitation(String eventId, String code, String time, String email);
 
-  void acceptEventEmailInvitation(String eventId, String code, String time, String email);
+  String acceptEventEmailInvitation(String eventId, String code, String time, String email);
 
   void notifyEventMembers(String eventId, String msgContent);
 
