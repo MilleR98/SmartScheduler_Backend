@@ -4,6 +4,7 @@ import com.miller.smartscheduler.model.Event;
 import com.miller.smartscheduler.model.dto.EventDTO;
 import com.miller.smartscheduler.model.dto.EventMemberDTO;
 import com.miller.smartscheduler.model.dto.EventPreviewDTO;
+import com.miller.smartscheduler.model.dto.EventTimeConflictDTO;
 import com.miller.smartscheduler.service.EventService;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -82,6 +83,14 @@ public class EventController {
   public void acceptInvitation(@PathVariable("id") String eventId, @RequestHeader("userId") String userId) {
 
     eventService.acceptEventInvitation(eventId, userId);
+  }
+
+  @PostMapping("/check-time-conflict")
+  public EventTimeConflictDTO eventTimeValidation(@RequestHeader("userId") String userId,
+      @RequestParam(value = "from") LocalDateTime startTime,
+      @RequestParam(value = "to") LocalDateTime endTime) {
+
+    return eventService.eventTimeValidation(userId, startTime, endTime);
   }
 
   @PostMapping("/{id}/notify-members")

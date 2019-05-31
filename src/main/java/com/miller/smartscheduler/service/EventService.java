@@ -4,6 +4,7 @@ import com.miller.smartscheduler.model.Event;
 import com.miller.smartscheduler.model.dto.EventDTO;
 import com.miller.smartscheduler.model.dto.EventMemberDTO;
 import com.miller.smartscheduler.model.dto.EventPreviewDTO;
+import com.miller.smartscheduler.model.dto.EventTimeConflictDTO;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -28,4 +29,6 @@ public interface EventService extends CommonService<Event> {
   void declineEventInvitation(String eventId, String userId);
 
   void acceptEventInvitation(String eventId, String userId);
+
+  EventTimeConflictDTO eventTimeValidation(String userId, LocalDateTime startTime, LocalDateTime endTime);
 }

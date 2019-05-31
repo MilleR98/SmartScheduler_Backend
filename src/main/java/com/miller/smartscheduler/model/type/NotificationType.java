@@ -4,5 +4,6 @@ public enum NotificationType {
 
   REMINDER,
   INFO,
-  INVITATION
+  INVITATION,
+  TIME_CONFLICT
 }

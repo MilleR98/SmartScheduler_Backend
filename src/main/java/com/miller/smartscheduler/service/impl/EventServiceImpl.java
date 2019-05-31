@@ -6,6 +6,7 @@ import static java.util.Objects.nonNull;
 
 import com.miller.smartscheduler.error.exception.BadRequestException;
 import com.miller.smartscheduler.error.exception.ContentNotFoundException;
+import com.miller.smartscheduler.error.exception.EventTimeConflictException;
 import com.miller.smartscheduler.model.Event;
 import com.miller.smartscheduler.model.EventLocation;
 import com.miller.smartscheduler.model.EventMember;
@@ -14,6 +15,7 @@ import com.miller.smartscheduler.model.User;
 import com.miller.smartscheduler.model.dto.EventDTO;
 import com.miller.smartscheduler.model.dto.EventMemberDTO;
 import com.miller.smartscheduler.model.dto.EventPreviewDTO;
+import com.miller.smartscheduler.model.dto.EventTimeConflictDTO;
 import com.miller.smartscheduler.model.type.EmailMessageType;
 import com.miller.smartscheduler.model.type.EventMemberPermission;
 import com.miller.smartscheduler.model.type.NotificationType;
@@ -27,12 +29,16 @@ import com.miller.smartscheduler.service.FirebaseMessagingService;
 import com.miller.smartscheduler.service.InvitationService;
 import com.miller.smartscheduler.service.NotificationService;
 import com.miller.smartscheduler.service.UserService;
+import com.miller.smartscheduler.util.ReminderTimeUtil;
 import com.miller.smartscheduler.util.SmartUtils;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -45,6 +51,7 @@ import org.thymeleaf.context.Context;
 public class EventServiceImpl extends CommonServiceImpl<Event> implements EventService {
 
   private final EventRepository eventRepository;
+  private final ScheduledExecutorService executor;
   private final EventMemberService eventMemberService;
   private final EventLocationService eventLocationService;
   private final UserService userService;
@@ -54,12 +61,13 @@ public class EventServiceImpl extends CommonServiceImpl<Event> implements EventS
   private final NotificationService notificationService;
   private final TemplateEngine templateEngine;
 
-  public EventServiceImpl(EventRepository eventRepository, EventMemberService eventMemberService,
+  public EventServiceImpl(EventRepository eventRepository, ScheduledExecutorService executor, EventMemberService eventMemberService,
       EventLocationService eventLocationService,
       UserService userService, InvitationService invitationService, FirebaseMessagingService firebaseMessagingService,
       EmailService emailService, NotificationService notificationService, TemplateEngine templateEngine) {
     super(eventRepository);
     this.eventRepository = eventRepository;
+    this.executor = executor;
     this.eventMemberService = eventMemberService;
     this.eventLocationService = eventLocationService;
     this.userService = userService;
@@ -89,7 +97,8 @@ public class EventServiceImpl extends CommonServiceImpl<Event> implements EventS
 
     if (nonNull(from) && nonNull(to)) {
 
-      eventPredicate = event -> event.getStartDate().isAfter(from) || event.getStartDate().isBefore(to);
+      eventPredicate = event -> (event.getStartDate().isAfter(from) || event.getStartDate().isEqual(from))
+          && (event.getStartDate().isBefore(to) || event.getStartDate().isEqual(to));
     } else if (nonNull(from)) {
 
       eventPredicate = event -> event.getStartDate().isAfter(from) || event.getStartDate().isEqual(from);
@@ -161,7 +170,22 @@ public class EventServiceImpl extends CommonServiceImpl<Event> implements EventS
     eventOwner.setUserId(userId);
     eventMemberService.save(eventOwner);
 
+    eventDTO.getEventReminders().forEach(reminderConfig ->
+        executor.schedule(() -> remindAboutEvent(eventDTO, userId), ReminderTimeUtil.getOneTimeReminderDelay(eventDTO.getStartDate(), reminderConfig),
+            TimeUnit.MINUTES));
+
     eventDTO.getMemberDTOList().forEach(eventMemberDTO -> inviteMemberToEvent(eventId, userId, eventMemberDTO));
+  }
+
+  private void remindAboutEvent(EventDTO eventDTO, String userId) {
+
+    EventLocation eventLocation = eventDTO.getEventLocation();
+    String eventTime = eventDTO.getStartDate().format(DateTimeFormatter.ISO_LOCAL_DATE) + " - " + eventDTO.getStartDate().format(DateTimeFormatter.ISO_LOCAL_DATE);
+    String address = eventLocation.getCountry() + ", " + eventLocation.getCity() + ", " + eventLocation.getStreet() + " street, " + eventLocation.getBuildingNumber();
+
+    firebaseMessagingService.sendSimplePushNotification(eventDTO.getName(),
+        "Hey! You have an event " + eventDTO.getName() + ". Time " + eventTime + ". Location: " + address,
+        userId);
   }
 
   @Override
@@ -271,7 +295,7 @@ public class EventServiceImpl extends CommonServiceImpl<Event> implements EventS
 
     if (isCode(code, hashed)) {
 
-      acceptInvitation(member, eventOwnerId, eventMember, event.getName());
+      acceptInvitation(member, eventOwnerId, eventMember, event);
 
     } else {
 
@@ -329,24 +353,44 @@ public class EventServiceImpl extends CommonServiceImpl<Event> implements EventS
     User member = userService.find(userId).orElseThrow(ContentNotFoundException::new);
     String eventOwnerId = eventMemberService.findByEventIdAndMemberPermission(eventId, OWNER).get(0).getUserId();
     EventMember eventMember = eventMemberService.findByEventAndUser(eventId, member.getUserId());
-    String eventName = find(eventId).orElseThrow(ContentNotFoundException::new).getName();
+    Event event = find(eventId).orElseThrow(ContentNotFoundException::new);
 
-    acceptInvitation(member, eventOwnerId, eventMember, eventName);
-
+    acceptInvitation(member, eventOwnerId, eventMember, event);
   }
 
-  private void acceptInvitation(User member, String eventOwnerId, EventMember eventMember, String eventName) {
+  @Override
+  public EventTimeConflictDTO eventTimeValidation(String userId, LocalDateTime startTime, LocalDateTime endTime) {
+
+    EventTimeConflictDTO eventTimeConflictDTO = new EventTimeConflictDTO();
+
+    List<EventPreviewDTO> eventPreview = findUserEvents(userId, null, null).stream()
+        .filter(event -> SmartUtils.isEventTimeIntersectInterval(startTime, endTime, event.getStartDate(), event.getEndDate()))
+        .map(event -> mapToEventPreviewDTO(event, userId))
+        .collect(Collectors.toList());
+
+    eventTimeConflictDTO.setInterceptedEvents(eventPreview);
+
+    return eventTimeConflictDTO;
+  }
+
+  private void acceptInvitation(User member, String eventOwnerId, EventMember eventMember, Event event) {
     if (!eventMember.isAccepted()) {
+
+      EventTimeConflictDTO eventTimeConflictDTO = eventTimeValidation(member.getUserId(), event.getStartDate(), event.getEndDate());
+      if (!eventTimeConflictDTO.getInterceptedEvents().isEmpty()) {
+
+        throw new EventTimeConflictException("Invited event time conflicts with your existing events");
+      }
 
       eventMember.setAccepted(true);
       eventMemberService.save(eventMember);
 
       firebaseMessagingService.sendSimplePushNotification("Member accept invitation",
           member.getFirstName() + " " + member.getLastName() + " has accepted invitation to event"
-              + eventName, eventOwnerId);
+              + event.getName(), eventOwnerId);
 
       Notification notification = new Notification();
-      notification.setContent(member.getFirstName() + " " + member.getLastName() + " has accepted your invitation to the event " + eventName);
+      notification.setContent(member.getFirstName() + " " + member.getLastName() + " has accepted your invitation to the event " + event.getName());
       notification.setTitle("Event invitation");
       notification.setUserId(eventOwnerId);
       notification.setNotificationType(NotificationType.INFO);

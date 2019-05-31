@@ -1,6 +1,7 @@
 package com.miller.smartscheduler.service.impl;
 
 import com.miller.smartscheduler.error.exception.ContentNotFoundException;
+import com.miller.smartscheduler.model.ReminderConfig;
 import com.miller.smartscheduler.model.SimpleTask;
 import com.miller.smartscheduler.model.Subtask;
 import com.miller.smartscheduler.model.dto.CreateTaskDTO;
@@ -11,7 +12,10 @@ import com.miller.smartscheduler.repository.SimpleTaskRepository;
 import com.miller.smartscheduler.service.FirebaseMessagingService;
 import com.miller.smartscheduler.service.SimpleTaskService;
 import com.miller.smartscheduler.service.SubtaskService;
+import com.miller.smartscheduler.util.ReminderTimeUtil;
 import java.util.List;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
@@ -19,13 +23,15 @@ import org.springframework.stereotype.Service;
 public class SimpleTaskServiceImpl extends CommonServiceImpl<SimpleTask> implements SimpleTaskService {
 
   private final SimpleTaskRepository simpleTaskRepository;
+  private final ScheduledExecutorService executor;
   private final SubtaskService subtaskService;
   private final FirebaseMessagingService firebaseMessagingService;
 
-  public SimpleTaskServiceImpl(SimpleTaskRepository simpleTaskRepository, SubtaskService subtaskService,
+  public SimpleTaskServiceImpl(SimpleTaskRepository simpleTaskRepository, ScheduledExecutorService executor, SubtaskService subtaskService,
       FirebaseMessagingService firebaseMessagingService) {
     super(simpleTaskRepository);
     this.simpleTaskRepository = simpleTaskRepository;
+    this.executor = executor;
     this.subtaskService = subtaskService;
     this.firebaseMessagingService = firebaseMessagingService;
   }
@@ -42,8 +48,7 @@ public class SimpleTaskServiceImpl extends CommonServiceImpl<SimpleTask> impleme
     SimpleTask simpleTask = new SimpleTask();
     simpleTask.setUserId(userId);
     simpleTask.setDeadlineDate(createTaskDTO.getDeadlineDate());
-    simpleTask.setReminderTime(createTaskDTO.getReminderTime());
-    simpleTask.setReminderType(createTaskDTO.getReminderType());
+    simpleTask.setReminderConfig(new ReminderConfig(createTaskDTO.getReminderType(), createTaskDTO.getReminderTime()));
     simpleTask.setTitle(createTaskDTO.getTitle());
     simpleTask.setDescription(createTaskDTO.getDescription());
 
@@ -54,8 +59,26 @@ public class SimpleTaskServiceImpl extends CommonServiceImpl<SimpleTask> impleme
       subtaskService.save(subtask);
     });
 
-    firebaseMessagingService.sendSimplePushNotification("Action successfull",
-        "New task '" + simpleTask.getTitle() + "' created. Good luck with progress", userId);
+    List<Long> notificationTimeValues = ReminderTimeUtil.calculateScheduledReminderTimes(simpleTask.getDeadlineDate(), simpleTask.getReminderConfig());
+
+    notificationTimeValues.forEach(reminderDelay ->
+        executor.schedule(() -> remindAboutTask(simpleTask), reminderDelay, TimeUnit.MINUTES));
+  }
+
+  private void remindAboutTask(SimpleTask simpleTask) {
+
+    String notificationBody;
+    if (simpleTask.getDeadlineDate().isEqual(simpleTask.getReminderConfig().getReminderTime())) {
+
+      notificationBody = "Hey! Deadline for task " + simpleTask.getTitle();
+    } else {
+
+      notificationBody = "Hey! You have a task " + simpleTask.getTitle() + ". Deadline: " + simpleTask.getDeadlineDate();
+    }
+
+    firebaseMessagingService.sendSimplePushNotification(simpleTask.getTitle(),
+        notificationBody,
+        simpleTask.getUserId());
   }
 
   @Override
@@ -75,7 +98,8 @@ public class SimpleTaskServiceImpl extends CommonServiceImpl<SimpleTask> impleme
     taskInfo.setDeadlineDate(simpleTask.getDeadlineDate().withSecond(0).withNano(0));
     taskInfo.setCreatedAt(simpleTask.getCreatedAt().withSecond(0).withNano(0));
     taskInfo.setReminderTime(simpleTask.getCreatedAt().withSecond(0).withNano(0));
-    taskInfo.setReminderType(simpleTask.getReminderType());
+    taskInfo.setReminderType(simpleTask.getReminderConfig().getReminderType());
+    taskInfo.setReminderTime(simpleTask.getReminderConfig().getReminderTime());
     taskInfo.setId(simpleTask.getId());
     taskInfo.setTitle(simpleTask.getTitle());
     taskInfo.setDescription(simpleTask.getDescription());

@@ -1,5 +1,7 @@
 package com.miller.smartscheduler.configuration;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,5 +21,11 @@ public class BeanConfig {
   public RestTemplate restTemplate(RestTemplateBuilder builder) {
 
     return builder.build();
+  }
+
+  @Bean
+  public ScheduledExecutorService getNotificationScheduledExecutorService() {
+
+    return Executors.newScheduledThreadPool(15);
   }
 }

@@ -22,19 +22,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class AuthExceptionHandlerController {
 
-  @ExceptionHandler(MethodArgumentNotValidException.class)
-  public ResponseEntity<ErrorResponse> validationError(MethodArgumentNotValidException ex) {
-
-    String errorMessage = ex.getBindingResult().getFieldErrors().stream()
-        .map(DefaultMessageSourceResolvable::getDefaultMessage)
-        .findFirst()
-        .orElse(ex.getMessage());
-
-    log.error(errorMessage);
-
-    return new ResponseEntity<>(new ErrorResponse(errorMessage, ENTITY_VALIDATION_ERROR), HttpStatus.BAD_REQUEST);
-  }
-
   @ExceptionHandler(SignatureException.class)
   public ResponseEntity<ErrorResponse> tokenSignatureError(SignatureException ex) {
     log.error(ex.getMessage());
