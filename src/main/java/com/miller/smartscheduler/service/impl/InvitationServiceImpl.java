@@ -1,18 +1,14 @@
 package com.miller.smartscheduler.service.impl;
 
-import static com.miller.smartscheduler.model.type.EventMemberPermission.OWNER;
 import static com.miller.smartscheduler.util.SmartUtils.SERVER_HOST;
 
-import com.miller.smartscheduler.error.exception.ContentNotFoundException;
 import com.miller.smartscheduler.model.Event;
 import com.miller.smartscheduler.model.EventLocation;
 import com.miller.smartscheduler.model.User;
 import com.miller.smartscheduler.model.dto.EventMemberDTO;
 import com.miller.smartscheduler.model.type.EmailMessageType;
 import com.miller.smartscheduler.service.EmailService;
-import com.miller.smartscheduler.service.EventMemberService;
 import com.miller.smartscheduler.service.InvitationService;
-import com.miller.smartscheduler.service.UserService;
 import com.miller.smartscheduler.util.SmartUtils;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;

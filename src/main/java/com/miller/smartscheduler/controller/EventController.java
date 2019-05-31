@@ -31,16 +31,16 @@ public class EventController {
 
   @GetMapping
   public List<Event> getUserEvents(@RequestHeader("userId") String userId,
-      @RequestParam(value = "from", required = false) LocalDateTime from, @RequestParam(value = "to", required = false) LocalDateTime to) {
+      @RequestParam(value = "from", required = false) String from, @RequestParam(value = "to", required = false) String to) {
 
-    return eventService.findUserEvents(userId, from, to);
+    return eventService.findUserEvents(userId, LocalDateTime.parse(from), LocalDateTime.parse(to));
   }
 
   @GetMapping("/previews")
   public List<EventPreviewDTO> getUserEventsPreview(@RequestHeader("userId") String userId,
-      @RequestParam(value = "from", required = false) LocalDateTime from, @RequestParam(value = "to", required = false) LocalDateTime to) {
+      @RequestParam(value = "from", required = false) String from, @RequestParam(value = "to", required = false) String to) {
 
-    return eventService.findUserEventsPreview(userId, from, to);
+    return eventService.findUserEventsPreview(userId, LocalDateTime.parse(from), LocalDateTime.parse(to));
   }
 
   @GetMapping("/{id}")

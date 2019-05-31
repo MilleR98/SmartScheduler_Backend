@@ -1,7 +1,6 @@
 package com.miller.smartscheduler.model.dto;
 
 import com.miller.smartscheduler.model.EventLocation;
-import com.miller.smartscheduler.model.ReminderConfig;
 import com.miller.smartscheduler.model.type.EventCategory;
 import com.miller.smartscheduler.model.type.EventMemberPermission;
 import java.time.LocalDateTime;
@@ -13,7 +12,7 @@ public class EventDTO {
 
   private String id;
   private String name;
-  private List<ReminderConfig> eventReminders;
+  private boolean enableReminders;
   private LocalDateTime startDate;
   private LocalDateTime endDate;
   private String description;

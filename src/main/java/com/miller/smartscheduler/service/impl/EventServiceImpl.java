@@ -29,7 +29,6 @@ import com.miller.smartscheduler.service.FirebaseMessagingService;
 import com.miller.smartscheduler.service.InvitationService;
 import com.miller.smartscheduler.service.NotificationService;
 import com.miller.smartscheduler.service.UserService;
-import com.miller.smartscheduler.util.ReminderTimeUtil;
 import com.miller.smartscheduler.util.SmartUtils;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -38,7 +37,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -156,11 +154,12 @@ public class EventServiceImpl extends CommonServiceImpl<Event> implements EventS
 
     Event event = new Event();
     event.setDescription(eventDTO.getDescription());
-    event.setName(event.getName());
-    event.setEndDate(event.getEndDate());
-    event.setStartDate(event.getStartDate());
-    event.setEventCategory(event.getEventCategory());
+    event.setName(eventDTO.getName());
+    event.setEndDate(eventDTO.getEndDate());
+    event.setStartDate(eventDTO.getStartDate());
+    event.setEventCategory(eventDTO.getEventCategory());
     event.setLocationId(eventLocationId);
+    event.setEnableReminders(eventDTO.isEnableReminders());
     String eventId = this.saveAndReturn(event).getId();
 
     EventMember eventOwner = new EventMember();
@@ -170,9 +169,9 @@ public class EventServiceImpl extends CommonServiceImpl<Event> implements EventS
     eventOwner.setUserId(userId);
     eventMemberService.save(eventOwner);
 
-    eventDTO.getEventReminders().forEach(reminderConfig ->
-        executor.schedule(() -> remindAboutEvent(eventDTO, userId), ReminderTimeUtil.getOneTimeReminderDelay(eventDTO.getStartDate(), reminderConfig),
-            TimeUnit.MINUTES));
+    if (event.isEnableReminders()) {
+      //todo event reminders
+    }
 
     eventDTO.getMemberDTOList().forEach(eventMemberDTO -> inviteMemberToEvent(eventId, userId, eventMemberDTO));
   }

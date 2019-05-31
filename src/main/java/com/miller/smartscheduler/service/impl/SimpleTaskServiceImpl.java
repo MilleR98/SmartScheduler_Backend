@@ -1,7 +1,6 @@
 package com.miller.smartscheduler.service.impl;
 
 import com.miller.smartscheduler.error.exception.ContentNotFoundException;
-import com.miller.smartscheduler.model.ReminderConfig;
 import com.miller.smartscheduler.model.SimpleTask;
 import com.miller.smartscheduler.model.Subtask;
 import com.miller.smartscheduler.model.dto.CreateTaskDTO;
@@ -48,7 +47,8 @@ public class SimpleTaskServiceImpl extends CommonServiceImpl<SimpleTask> impleme
     SimpleTask simpleTask = new SimpleTask();
     simpleTask.setUserId(userId);
     simpleTask.setDeadlineDate(createTaskDTO.getDeadlineDate());
-    simpleTask.setReminderConfig(new ReminderConfig(createTaskDTO.getReminderType(), createTaskDTO.getReminderTime()));
+    simpleTask.setReminderTime(createTaskDTO.getReminderTime());
+    simpleTask.setReminderType(createTaskDTO.getReminderType());
     simpleTask.setTitle(createTaskDTO.getTitle());
     simpleTask.setDescription(createTaskDTO.getDescription());
 
@@ -59,7 +59,7 @@ public class SimpleTaskServiceImpl extends CommonServiceImpl<SimpleTask> impleme
       subtaskService.save(subtask);
     });
 
-    List<Long> notificationTimeValues = ReminderTimeUtil.calculateScheduledReminderTimes(simpleTask.getDeadlineDate(), simpleTask.getReminderConfig());
+    List<Long> notificationTimeValues = ReminderTimeUtil.calculateScheduledReminderTimes(simpleTask.getDeadlineDate(), simpleTask.getReminderTime(), simpleTask.getReminderType());
 
     notificationTimeValues.forEach(reminderDelay ->
         executor.schedule(() -> remindAboutTask(simpleTask), reminderDelay, TimeUnit.MINUTES));
@@ -68,7 +68,7 @@ public class SimpleTaskServiceImpl extends CommonServiceImpl<SimpleTask> impleme
   private void remindAboutTask(SimpleTask simpleTask) {
 
     String notificationBody;
-    if (simpleTask.getDeadlineDate().isEqual(simpleTask.getReminderConfig().getReminderTime())) {
+    if (simpleTask.getDeadlineDate().isEqual(simpleTask.getReminderTime())) {
 
       notificationBody = "Hey! Deadline for task " + simpleTask.getTitle();
     } else {
@@ -98,8 +98,8 @@ public class SimpleTaskServiceImpl extends CommonServiceImpl<SimpleTask> impleme
     taskInfo.setDeadlineDate(simpleTask.getDeadlineDate().withSecond(0).withNano(0));
     taskInfo.setCreatedAt(simpleTask.getCreatedAt().withSecond(0).withNano(0));
     taskInfo.setReminderTime(simpleTask.getCreatedAt().withSecond(0).withNano(0));
-    taskInfo.setReminderType(simpleTask.getReminderConfig().getReminderType());
-    taskInfo.setReminderTime(simpleTask.getReminderConfig().getReminderTime());
+    taskInfo.setReminderType(simpleTask.getReminderType());
+    taskInfo.setReminderTime(simpleTask.getReminderTime());
     taskInfo.setId(simpleTask.getId());
     taskInfo.setTitle(simpleTask.getTitle());
     taskInfo.setDescription(simpleTask.getDescription());

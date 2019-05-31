@@ -12,7 +12,7 @@ public class Event {
   private String name;
   private LocalDateTime startDate;
   private LocalDateTime endDate;
-  private List<ReminderConfig> eventReminders;
+  private boolean enableReminders;
   private String description;
   private EventCategory eventCategory;
   private String locationId;
