@@ -30,6 +30,12 @@ public class EventMemberServiceImpl extends CommonServiceImpl<EventMember> imple
   }
 
   @Override
+  public void removeByUserIdAndEventId(String userId, String eventId) {
+
+    eventMemberRepository.removeByUserIdAndEventId(userId, eventId);
+  }
+
+  @Override
   public void removeAllByEventId(String eventId) {
 
     eventMemberRepository.removeAllByEventId(eventId);

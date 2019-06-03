@@ -9,6 +9,7 @@ import lombok.Data;
 @Data
 public class TaskPreviewDTO {
 
+  private String id;
   private String title;
   private LocalDateTime deadlineDate;
   private LocalDateTime createdAt;

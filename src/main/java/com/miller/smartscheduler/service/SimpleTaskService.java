@@ -15,4 +15,6 @@ public interface SimpleTaskService extends CommonService<SimpleTask>{
   List<TaskPreviewDTO> getUserTaskPreviews(String userId);
 
   TaskInfoDTO getTaskInfo(String id);
+
+  void updateTask(String id, CreateTaskDTO simpleTask);
 }

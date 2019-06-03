@@ -55,9 +55,9 @@ public class SimpleTaskController {
   }
 
   @PutMapping("/{id}")
-  public ResponseEntity updateTask(@PathVariable("id") String id, @RequestBody SimpleTask simpleTask) {
+  public ResponseEntity updateTask(@PathVariable("id") String id, @RequestBody CreateTaskDTO simpleTask) {
 
-    simpleTaskService.update(id, simpleTask);
+    simpleTaskService.updateTask(id, simpleTask);
 
     return new ResponseEntity(HttpStatus.OK);
   }

@@ -6,7 +6,9 @@ import com.miller.smartscheduler.model.dto.EventMemberDTO;
 import com.miller.smartscheduler.model.dto.EventPreviewDTO;
 import com.miller.smartscheduler.model.dto.EventTimeConflictDTO;
 import com.miller.smartscheduler.service.EventService;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -43,16 +45,29 @@ public class EventController {
     return eventService.findUserEventsPreview(userId, LocalDateTime.parse(from), LocalDateTime.parse(to));
   }
 
+  @GetMapping("/day-markers")
+  public List<LocalDate> getDaysWithEvents(@RequestHeader("userId") String userId,
+      @RequestParam(value = "month", required = false) Month month) {
+
+    return eventService.getDaysWithEvents(userId, month);
+  }
+
   @GetMapping("/{id}")
   public EventDTO getEventInfo(@PathVariable("id") String id) {
 
     return eventService.findFullEventInfo(id);
   }
 
-  @PostMapping("/{id}/invite")
+  @PostMapping("/{id}/members/invite")
   public void inviteMemberToEvent(@PathVariable("id") String eventId, @RequestHeader("userId") String userId, @RequestBody EventMemberDTO eventMemberDTO) {
 
     eventService.inviteMemberToEvent(eventId, userId, eventMemberDTO);
+  }
+
+  @DeleteMapping("/{eventId}/members/{memberId}")
+  public void deleteMemberEvent(@PathVariable("eventId") String eventId, @PathVariable("memberId") String memberId) {
+
+    eventService.deleteMemberEvent(eventId, memberId);
   }
 
   @PostMapping("/email-invitation/decline")
@@ -73,7 +88,7 @@ public class EventController {
     return eventService.acceptEventEmailInvitation(eventId, code, time, email);
   }
 
-  @PostMapping("{id}/invitation/decline")
+  @PostMapping("/{id}/invitation/decline")
   public void declineInvitation(@PathVariable("id") String eventId, @RequestHeader("userId") String userId) {
 
     eventService.declineEventInvitation(eventId, userId);
@@ -109,9 +124,9 @@ public class EventController {
   }
 
   @PutMapping("/{id}")
-  public ResponseEntity updateEvent(@PathVariable("id") String id, @RequestBody Event eventDTO) {
+  public ResponseEntity updateEvent(@PathVariable("id") String id, @RequestBody EventDTO eventDTO) {
 
-    eventService.update(id, eventDTO);
+    eventService.updateEvent(id, eventDTO);
 
     return new ResponseEntity(HttpStatus.OK);
   }

@@ -2,6 +2,7 @@ package com.miller.smartscheduler.service.impl;
 
 import static com.miller.smartscheduler.model.type.EventMemberPermission.OWNER;
 import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE;
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 import com.miller.smartscheduler.error.exception.BadRequestException;
@@ -30,7 +31,11 @@ import com.miller.smartscheduler.service.InvitationService;
 import com.miller.smartscheduler.service.NotificationService;
 import com.miller.smartscheduler.service.UserService;
 import com.miller.smartscheduler.util.SmartUtils;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.Month;
+import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
@@ -39,6 +44,7 @@ import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
@@ -84,7 +90,7 @@ public class EventServiceImpl extends CommonServiceImpl<Event> implements EventS
         .map(EventMember::getEventId)
         .collect(Collectors.toList());
 
-    List<Event> eventList = eventRepository.findAllById(eventIds);
+    List<Event> eventList = eventRepository.findAllByIdIn(eventIds);
 
     return filterByDate(from, to, eventList);
   }
@@ -95,14 +101,18 @@ public class EventServiceImpl extends CommonServiceImpl<Event> implements EventS
 
     if (nonNull(from) && nonNull(to)) {
 
-      eventPredicate = event -> (event.getStartDate().isAfter(from) || event.getStartDate().isEqual(from))
-          && (event.getStartDate().isBefore(to) || event.getStartDate().isEqual(to));
+      eventPredicate = event -> ((event.getStartDate().isAfter(from) || event.getStartDate().isEqual(from))
+          && (event.getStartDate().isBefore(to) || event.getStartDate().isEqual(to))) ||
+          ((event.getEndDate().isAfter(from) || event.getEndDate().isEqual(from))
+              && (event.getEndDate().isBefore(to) || event.getEndDate().isEqual(to)));
     } else if (nonNull(from)) {
 
-      eventPredicate = event -> event.getStartDate().isAfter(from) || event.getStartDate().isEqual(from);
+      eventPredicate = event -> event.getStartDate().isAfter(from) || event.getStartDate().isEqual(from)
+          || event.getEndDate().isAfter(from) || event.getEndDate().isEqual(from);
     } else if (nonNull(to)) {
 
-      eventPredicate = event -> event.getStartDate().isBefore(to) || event.getStartDate().isEqual(to);
+      eventPredicate = event -> event.getStartDate().isBefore(to) || event.getStartDate().isEqual(to)
+          || event.getEndDate().isBefore(to) || event.getEndDate().isEqual(to);
     } else {
 
       return eventList;
@@ -122,6 +132,7 @@ public class EventServiceImpl extends CommonServiceImpl<Event> implements EventS
         .orElseThrow(() -> new ContentNotFoundException("Cannot find event location info"));
 
     List<EventMemberDTO> eventMembers = eventMemberService.findAllByEventId(id).stream()
+        .filter(eventMember -> !eventMember.getEventMemberPermission().equals(OWNER))
         .map(this::mapToEventMemberDTO)
         .collect(Collectors.toList());
 
@@ -372,6 +383,54 @@ public class EventServiceImpl extends CommonServiceImpl<Event> implements EventS
     return eventTimeConflictDTO;
   }
 
+  @Override
+  public List<LocalDate> getDaysWithEvents(String userId, Month month) {
+
+    List<LocalDate> daysWithEvents;
+
+    if (isNull(month)) {
+
+      daysWithEvents = eventRepository.findAll().stream()
+          .flatMap(event -> Stream.of(event.getStartDate().toLocalDate(), event.getEndDate().toLocalDate()))
+          .distinct()
+          .collect(Collectors.toList());
+
+    } else {
+
+      YearMonth yearMonth = YearMonth.of(2019, month);
+      LocalDateTime start = LocalDateTime.of(yearMonth.atDay(1), LocalTime.MIN);
+      LocalDateTime end = LocalDateTime.of(yearMonth.atEndOfMonth(), LocalTime.MAX);
+
+      daysWithEvents = eventRepository.findAllByStartDateBetween(start, end).stream()
+          .flatMap(event -> Stream.of(event.getStartDate().toLocalDate(), event.getEndDate().toLocalDate()))
+          .distinct()
+          .collect(Collectors.toList());
+    }
+
+    return daysWithEvents;
+  }
+
+  @Override
+  public void deleteMemberEvent(String eventId, String memberId) {
+
+    eventMemberService.removeByUserIdAndEventId(memberId, eventId);
+  }
+
+  @Override
+  public void updateEvent(String id, EventDTO eventDTO) {
+
+    Event event = find(id).orElseThrow(ContentNotFoundException::new);
+
+    eventLocationService.update(event.getLocationId(), eventDTO.getEventLocation());
+
+    event.setDescription(eventDTO.getDescription());
+    event.setName(eventDTO.getName());
+    event.setEndDate(eventDTO.getEndDate());
+    event.setStartDate(eventDTO.getStartDate());
+    event.setEventCategory(eventDTO.getEventCategory());
+    event.setEnableReminders(eventDTO.isEnableReminders());
+  }
+
   private void acceptInvitation(User member, String eventOwnerId, EventMember eventMember, Event event) {
     if (!eventMember.isAccepted()) {
 
@@ -391,6 +450,7 @@ public class EventServiceImpl extends CommonServiceImpl<Event> implements EventS
       Notification notification = new Notification();
       notification.setContent(member.getFirstName() + " " + member.getLastName() + " has accepted your invitation to the event " + event.getName());
       notification.setTitle("Event invitation");
+      notification.getAdditionalParameters().put("eventId", event.getId());
       notification.setUserId(eventOwnerId);
       notification.setNotificationType(NotificationType.INFO);
 
@@ -416,7 +476,7 @@ public class EventServiceImpl extends CommonServiceImpl<Event> implements EventS
     eventPreviewDTO.setCurrentUserEventPermission(currentUserPermission);
 
     long activeMemberCount = eventMemberService.findAllByEventId(event.getId()).stream()
-        .filter(eventMember -> !eventMember.getEventMemberPermission().equals(OWNER) || eventMember.isAccepted())
+        .filter(eventMember -> !eventMember.getEventMemberPermission().equals(OWNER) && eventMember.isAccepted())
         .count();
 
     eventPreviewDTO.setMembersCount(activeMemberCount);

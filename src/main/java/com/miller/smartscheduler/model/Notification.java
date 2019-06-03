@@ -2,6 +2,7 @@ package com.miller.smartscheduler.model;
 
 import com.miller.smartscheduler.model.type.NotificationType;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Map;
 import lombok.Data;
 
@@ -13,7 +14,7 @@ public class Notification {
   private String content;
   private String title;
   private boolean seen;
-  private Map<String, String> additionalParameters;
+  private Map<String, String> additionalParameters = new HashMap<>();
   private LocalDateTime createdAt = LocalDateTime.now();
   private NotificationType notificationType;
 }

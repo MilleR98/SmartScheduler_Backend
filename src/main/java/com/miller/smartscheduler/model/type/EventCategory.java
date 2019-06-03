@@ -6,6 +6,6 @@ public enum EventCategory {
   WORK,
   FAMILY,
   FRIENDS,
-  INTERTAINMENT,
-  HOBBIE
+  ENTERTAINMENT,
+  HOBIE
 }

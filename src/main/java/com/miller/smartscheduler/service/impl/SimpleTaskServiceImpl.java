@@ -12,6 +12,7 @@ import com.miller.smartscheduler.service.FirebaseMessagingService;
 import com.miller.smartscheduler.service.SimpleTaskService;
 import com.miller.smartscheduler.service.SubtaskService;
 import com.miller.smartscheduler.util.ReminderTimeUtil;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -68,17 +69,20 @@ public class SimpleTaskServiceImpl extends CommonServiceImpl<SimpleTask> impleme
   private void remindAboutTask(SimpleTask simpleTask) {
 
     String notificationBody;
-    if (simpleTask.getDeadlineDate().isEqual(simpleTask.getReminderTime())) {
 
-      notificationBody = "Hey! Deadline for task " + simpleTask.getTitle();
-    } else {
+    if (simpleTask.getReminderTime().isEqual(LocalDateTime.now())) {
+      if (simpleTask.getDeadlineDate().isEqual(simpleTask.getReminderTime())) {
 
-      notificationBody = "Hey! You have a task " + simpleTask.getTitle() + ". Deadline: " + simpleTask.getDeadlineDate();
+        notificationBody = "Hey! Deadline for task " + simpleTask.getTitle();
+      } else {
+
+        notificationBody = "Hey! You have a task " + simpleTask.getTitle() + ". Deadline: " + simpleTask.getDeadlineDate();
+      }
+
+      firebaseMessagingService.sendSimplePushNotification(simpleTask.getTitle(),
+          notificationBody,
+          simpleTask.getUserId());
     }
-
-    firebaseMessagingService.sendSimplePushNotification(simpleTask.getTitle(),
-        notificationBody,
-        simpleTask.getUserId());
   }
 
   @Override
@@ -97,7 +101,6 @@ public class SimpleTaskServiceImpl extends CommonServiceImpl<SimpleTask> impleme
     TaskInfoDTO taskInfo = new TaskInfoDTO();
     taskInfo.setDeadlineDate(simpleTask.getDeadlineDate().withSecond(0).withNano(0));
     taskInfo.setCreatedAt(simpleTask.getCreatedAt().withSecond(0).withNano(0));
-    taskInfo.setReminderTime(simpleTask.getCreatedAt().withSecond(0).withNano(0));
     taskInfo.setReminderType(simpleTask.getReminderType());
     taskInfo.setReminderTime(simpleTask.getReminderTime());
     taskInfo.setId(simpleTask.getId());
@@ -108,8 +111,28 @@ public class SimpleTaskServiceImpl extends CommonServiceImpl<SimpleTask> impleme
     return taskInfo;
   }
 
+  @Override
+  public void updateTask(String id, CreateTaskDTO createTaskDTO) {
+
+    SimpleTask simpleTask = find(id).orElseThrow(ContentNotFoundException::new);
+
+    simpleTask.setDeadlineDate(createTaskDTO.getDeadlineDate());
+    simpleTask.setReminderTime(createTaskDTO.getReminderTime());
+    simpleTask.setReminderType(createTaskDTO.getReminderType());
+    simpleTask.setTitle(createTaskDTO.getTitle());
+    simpleTask.setDescription(createTaskDTO.getDescription());
+
+    update(id, simpleTask);
+
+    List<Long> notificationTimeValues = ReminderTimeUtil.calculateScheduledReminderTimes(simpleTask.getDeadlineDate(), simpleTask.getReminderTime(), simpleTask.getReminderType());
+
+    notificationTimeValues.forEach(reminderDelay ->
+        executor.schedule(() -> remindAboutTask(simpleTask), reminderDelay, TimeUnit.MINUTES));
+  }
+
   private TaskPreviewDTO mapToPreview(SimpleTask simpleTask) {
     TaskPreviewDTO taskPreviewDTO = new TaskPreviewDTO();
+    taskPreviewDTO.setId(simpleTask.getId());
     taskPreviewDTO.setDeadlineDate(simpleTask.getDeadlineDate().withSecond(0).withNano(0));
     taskPreviewDTO.setCreatedAt(simpleTask.getCreatedAt().withSecond(0).withNano(0));
     taskPreviewDTO.setTitle(simpleTask.getTitle());

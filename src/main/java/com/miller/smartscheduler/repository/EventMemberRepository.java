@@ -13,6 +13,8 @@ public interface EventMemberRepository extends MongoRepository<EventMember, Stri
 
   void removeAllByEventId(String eventId);
 
+  void removeByUserIdAndEventId(String userId, String eventId);
+
   List<EventMember> findByEventIdAndEventMemberPermission(String eventId, EventMemberPermission eventMemberPermission);
 
   EventMember findByEventIdAndUserId(String eventId, String userId);

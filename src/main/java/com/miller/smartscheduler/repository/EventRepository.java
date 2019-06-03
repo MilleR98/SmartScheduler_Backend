@@ -11,5 +11,5 @@ public interface EventRepository extends MongoRepository<Event, String> {
 
   List<Event> findAllByStartDateBetween(LocalDateTime searchStartDate, LocalDateTime searchEndDate);
 
-  List<Event> findAllById(List<String> eventIds);
+  List<Event> findAllByIdIn(List<String> eventIds);
 }
