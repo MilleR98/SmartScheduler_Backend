@@ -14,7 +14,7 @@ public interface EventService extends CommonService<Event> {
 
   List<Event> findUserEvents(String userId, LocalDateTime from, LocalDateTime to);
 
-  EventDTO findFullEventInfo(String id);
+  EventDTO findFullEventInfo(String id, String userId);
 
   void saveFullEvent(EventDTO eventDTO, String userId);
 

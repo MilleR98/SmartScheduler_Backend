@@ -12,7 +12,6 @@ import com.miller.smartscheduler.service.FirebaseMessagingService;
 import com.miller.smartscheduler.service.SimpleTaskService;
 import com.miller.smartscheduler.service.SubtaskService;
 import com.miller.smartscheduler.util.ReminderTimeUtil;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -70,19 +69,17 @@ public class SimpleTaskServiceImpl extends CommonServiceImpl<SimpleTask> impleme
 
     String notificationBody;
 
-    if (simpleTask.getReminderTime().isEqual(LocalDateTime.now())) {
-      if (simpleTask.getDeadlineDate().isEqual(simpleTask.getReminderTime())) {
+    if (simpleTask.getDeadlineDate().isEqual(simpleTask.getReminderTime())) {
 
-        notificationBody = "Hey! Deadline for task " + simpleTask.getTitle();
-      } else {
+      notificationBody = "Hey! Deadline for task " + simpleTask.getTitle();
+    } else {
 
-        notificationBody = "Hey! You have a task " + simpleTask.getTitle() + ". Deadline: " + simpleTask.getDeadlineDate();
-      }
-
-      firebaseMessagingService.sendSimplePushNotification(simpleTask.getTitle(),
-          notificationBody,
-          simpleTask.getUserId());
+      notificationBody = "Hey! You have a task " + simpleTask.getTitle() + ". Deadline: " + simpleTask.getDeadlineDate();
     }
+
+    firebaseMessagingService.sendSimplePushNotification(simpleTask.getTitle(),
+        notificationBody,
+        simpleTask.getUserId());
   }
 
   @Override

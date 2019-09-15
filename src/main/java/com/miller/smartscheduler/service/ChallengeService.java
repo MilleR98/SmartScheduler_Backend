@@ -9,4 +9,7 @@ public interface ChallengeService extends CommonService<Challenge> {
   List<Challenge> findAllByUserId(String userId);
 
   List<Challenge> findAllByUserIdAndStatus(String userId, ChallengeStatus status);
+
+  void updateStatus(String id, ChallengeStatus challengeStatus);
+
 }

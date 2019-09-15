@@ -10,7 +10,7 @@ public class SmartUtils {
 
   public static final String SALT = "mnjd093^*'~#44&($@�ZZUKJdc..-�sww";
   public static final int SECURITY_NUMBER = 5000;
-  public static final String SERVER_HOST = "http://localhost:8080";
+  public static final String SERVER_HOST = "https://d34fe8d2.ngrok.io";
 
   public static String generateSecurityCode(String email, String id, String timestamp) {
     String linkCode = email + SALT + id + timestamp;

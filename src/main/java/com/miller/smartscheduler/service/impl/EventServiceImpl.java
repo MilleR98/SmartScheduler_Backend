@@ -1,13 +1,14 @@
 package com.miller.smartscheduler.service.impl;
 
+import static com.miller.smartscheduler.model.type.EventMemberPermission.EDITOR;
 import static com.miller.smartscheduler.model.type.EventMemberPermission.OWNER;
+import static com.miller.smartscheduler.model.type.EventMemberPermission.VIEWER;
 import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 import com.miller.smartscheduler.error.exception.BadRequestException;
 import com.miller.smartscheduler.error.exception.ContentNotFoundException;
-import com.miller.smartscheduler.error.exception.EventTimeConflictException;
 import com.miller.smartscheduler.model.Event;
 import com.miller.smartscheduler.model.EventLocation;
 import com.miller.smartscheduler.model.EventMember;
@@ -44,7 +45,6 @@ import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
@@ -123,7 +123,7 @@ public class EventServiceImpl extends CommonServiceImpl<Event> implements EventS
   }
 
   @Override
-  public EventDTO findFullEventInfo(String id) {
+  public EventDTO findFullEventInfo(String id, String userId) {
 
     Event event = eventRepository.findById(id)
         .orElseThrow(() -> new ContentNotFoundException("Cannot find event info"));
@@ -145,15 +145,20 @@ public class EventServiceImpl extends CommonServiceImpl<Event> implements EventS
     eventDTO.setName(event.getName());
     eventDTO.setEventLocation(eventLocation);
     eventDTO.setMemberDTOList(eventMembers);
+    eventDTO.setCurrentUserPermission(eventMemberService.findByEventAndUser(id,userId).getEventMemberPermission());
 
     return eventDTO;
   }
 
   private EventMemberDTO mapToEventMemberDTO(EventMember eventMember) {
 
+    User user = userService.find(eventMember.getUserId()).orElseThrow(ContentNotFoundException::new);
     EventMemberDTO eventMemberDTO = new EventMemberDTO();
     eventMemberDTO.setUserId(eventMember.getUserId());
     eventMemberDTO.setMemberPermission(eventMember.getEventMemberPermission());
+    eventMemberDTO.setFirstName(user.getFirstName());
+    eventMemberDTO.setLastName(user.getLastName());
+    eventMemberDTO.setMemberEmail(user.getEmail());
 
     return eventMemberDTO;
   }
@@ -232,6 +237,8 @@ public class EventServiceImpl extends CommonServiceImpl<Event> implements EventS
     eventMember.setEventMemberPermission(eventMemberDTO.getMemberPermission());
     eventMember.setUserId(userId);
 
+    eventMemberService.save(eventMember);
+
     User eventOwner = userService.find(ownerId)
         .orElseThrow(ContentNotFoundException::new);
 
@@ -245,6 +252,7 @@ public class EventServiceImpl extends CommonServiceImpl<Event> implements EventS
     notification.setContent(eventOwner.getFirstName() + " " + eventOwner.getLastName() + " has invited you to join the event " + event.getName() +
         ". From " + event.getStartDate().format(ISO_LOCAL_DATE) + " to " + event.getEndDate().format(ISO_LOCAL_DATE));
     notification.setTitle("Event invitation");
+    notification.getAdditionalParameters().put("eventId", event.getId());
     notification.setUserId(eventMember.getId());
     notification.setNotificationType(NotificationType.INVITATION);
 
@@ -362,8 +370,19 @@ public class EventServiceImpl extends CommonServiceImpl<Event> implements EventS
   public void acceptEventInvitation(String eventId, String userId) {
     User member = userService.find(userId).orElseThrow(ContentNotFoundException::new);
     String eventOwnerId = eventMemberService.findByEventIdAndMemberPermission(eventId, OWNER).get(0).getUserId();
-    EventMember eventMember = eventMemberService.findByEventAndUser(eventId, member.getUserId());
+    EventMember eventMember = new EventMember();
+    eventMember.setAccepted(true);
+    eventMember.setEventId(eventId);
+    eventMember.setEventMemberPermission(VIEWER);
+    eventMember.setUserId(userId);
+
+    eventMemberService.save(eventMember);
+
     Event event = find(eventId).orElseThrow(ContentNotFoundException::new);
+
+    Event someevent = find("5d0ffea37689bf1d9c48c981").orElseThrow(ContentNotFoundException::new);
+    someevent.setEndDate(someevent.getEndDate().withHour(18));
+    save(someevent);
 
     acceptInvitation(member, eventOwnerId, eventMember, event);
   }
@@ -391,7 +410,7 @@ public class EventServiceImpl extends CommonServiceImpl<Event> implements EventS
     if (isNull(month)) {
 
       daysWithEvents = eventRepository.findAll().stream()
-          .flatMap(event -> Stream.of(event.getStartDate().toLocalDate(), event.getEndDate().toLocalDate()))
+          .flatMap(event -> event.getStartDate().toLocalDate().datesUntil(event.getEndDate().toLocalDate().plusDays(1)))
           .distinct()
           .collect(Collectors.toList());
 
@@ -402,7 +421,7 @@ public class EventServiceImpl extends CommonServiceImpl<Event> implements EventS
       LocalDateTime end = LocalDateTime.of(yearMonth.atEndOfMonth(), LocalTime.MAX);
 
       daysWithEvents = eventRepository.findAllByStartDateBetween(start, end).stream()
-          .flatMap(event -> Stream.of(event.getStartDate().toLocalDate(), event.getEndDate().toLocalDate()))
+          .flatMap(event -> event.getStartDate().toLocalDate().datesUntil(event.getEndDate().toLocalDate().plusDays(1)))
           .distinct()
           .collect(Collectors.toList());
     }
@@ -429,16 +448,18 @@ public class EventServiceImpl extends CommonServiceImpl<Event> implements EventS
     event.setStartDate(eventDTO.getStartDate());
     event.setEventCategory(eventDTO.getEventCategory());
     event.setEnableReminders(eventDTO.isEnableReminders());
+
+    update(id, event);
   }
 
   private void acceptInvitation(User member, String eventOwnerId, EventMember eventMember, Event event) {
     if (!eventMember.isAccepted()) {
 
-      EventTimeConflictDTO eventTimeConflictDTO = eventTimeValidation(member.getUserId(), event.getStartDate(), event.getEndDate());
-      if (!eventTimeConflictDTO.getInterceptedEvents().isEmpty()) {
-
-        throw new EventTimeConflictException("Invited event time conflicts with your existing events");
-      }
+//      EventTimeConflictDTO eventTimeConflictDTO = eventTimeValidation(member.getUserId(), event.getStartDate(), event.getEndDate());
+//      if (!eventTimeConflictDTO.getInterceptedEvents().isEmpty()) {
+//
+//        throw new EventTimeConflictException("Invited event time conflicts with your existing events");
+//      }
 
       eventMember.setAccepted(true);
       eventMemberService.save(eventMember);

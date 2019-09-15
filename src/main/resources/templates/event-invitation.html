@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head><title>SmartScheduler</title>
   <meta charset="UTF-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
@@ -21,15 +21,15 @@
     color: #483d8b;"></i>
   </div>
   <div style="text-align:left;padding-left:30px;padding-right:30px">
-    <p style="font-size:14px;color:#434a54;">Hi ${memberName},</p>
-    <p style="font-size:14px;color:#434a54;">${ownerFullName} ( <a href="">"${senderEmail}"</a> ) has invited you to join the event <strong>${eventName}</strong>.</p>
-    <p style="font-size:14px;color:#434a54;">Start date: ${startDate}</p>
-    <p style="font-size:14px;color:#434a54;">End date: ${endDate}</p>
-    <p style="font-size:14px;color:#434a54;">Location: ${eventAddress}</p>
+    <p style="font-size:14px;color:#434a54;">Hi <span th:text="${invitation.memberName}"></span>,</p>
+    <p style="font-size:14px;color:#434a54;"><span th:text="${invitation.ownerFullName}"></span> ( <a href=""><span th:text="${invitation.ownerEmail}"></span></a> ) has invited you to join the event <strong><span th:text="${invitation.eventName}"></span></strong>.</p>
+    <p  style="font-size:14px;color:#434a54;">Start date: <span th:text="${invitation.startDate}"></span> </p>
+    <p style="font-size:14px;color:#434a54;">End date: <span th:text="${invitation.endDate}"></span> </p>
+    <p style="font-size:14px;color:#434a54;">Location: <span th:text="${invitation.eventAddress}"></span> </p>
   </div>
-  <a class=\"big-btn\" href='${serverHost}/events/invitation/accept?eventId=${eventId}&code=${sha2LinkCode}&time=${timestamp}&email=${memberEmail}&eventName=${eventName}'
+  <a class=\"big-btn\" th:href="@{${invitation.acceptLink}}"
      style="background-color:#a1d36e;background-image:none;background-repeat:repeat;background-position:top left;background-attachment:scroll;padding-top:10px;padding-bottom:10px;padding-right:25px;padding-left:25px;text-transform:uppercase;color:#fff;-webkit-border-radius:5px;border-radius:5px;text-decoration:none;font-weight:600;display:block;width:250px;margin-top:20px;margin-bottom:20px;margin-right:auto;margin-left:auto;">
-    Join the SmartScheduler event ${eventName} </a><br>
+    Join the SmartScheduler event <span th:text="${invitation.eventName}"></span> </a><br>
   <div style="text-align:left; padding-left:30px;padding-right:30px">
     <p style="font-size:14px;color:#434a54;">Enjoy!</p>
     <p style="font-size:14px;color:#434a54;">- The SmartScheduler Team</p>
@@ -37,12 +37,10 @@
   <p style="padding:10px; font-size:10px;color:#434a54; text-align:right"></p>
 </div>
 <div style="color:#b1b4b5;display:block;margin-top:0;margin-bottom:0;margin-right:auto;margin-left:auto;">
-  <p style="color:#b1b4b5;display:block;margin-top:0;margin-bottom:0;margin-right:auto;margin-left:auto;">Or go to this URL to accept invitation : <a
-      href='${serverHost}/events/email-invitation/accept?eventId=${eventId}&code=${sha2LinkCode}&time=${timestamp}&email=${memberEmail}&eventName=${eventName}' style="color:#348fb4;">
-    ${serverHost}/events/email-invitation/accept?eventId=${eventId}&code=${sha2LinkCode}&time=${timestamp}&email=${memberEmail}&eventName=${eventName}</a></p>
-  <p style="color:#b1b4b5;display:block;margin-top:0;margin-bottom:0;margin-right:auto;margin-left:auto;">Or go to this URL to decline the invitation: <a
-      href='${serverHost}/events/email-invitation/decline?eventId=${eventId}&code=${sha2LinkCode}&time=${timestamp}&email=${memberEmail}' style="color:#348fb4;">
-    ${serverHost}/events/email-invitation/decline?eventId=${eventId}&code=${sha2LinkCode}&time=${timestamp}&email=${memberEmail}</a></p>
+  <p style="color:#b1b4b5;display:block;margin-top:0;margin-bottom:0;margin-right:auto;margin-left:auto;">Or go to this URL to accept invitation : <a th:href="@{${invitation.acceptLink}}" style="color:#348fb4;">
+    <span th:text="${invitation.acceptLink}"></span></a></p>
+  <p style="color:#b1b4b5;display:block;margin-top:0;margin-bottom:0;margin-right:auto;margin-left:auto;">Or go to this URL to decline the invitation: <a th:href="@{${invitation.declineLink}}" style="color:#348fb4;">
+    <span th:text="${invitation.declineLink}"></span></a></p>
 </div>
 </body>
 

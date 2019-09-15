@@ -38,6 +38,13 @@ public class EventController {
     return eventService.findUserEvents(userId, LocalDateTime.parse(from), LocalDateTime.parse(to));
   }
 
+  @GetMapping("/statistic")
+  public List<Event> getStatistic(@RequestHeader("userId") String userId,
+      @RequestParam(value = "from", required = false) String from, @RequestParam(value = "to", required = false) String to) {
+
+    return eventService.findUserEvents(userId, LocalDateTime.parse(from), LocalDateTime.parse(to));
+  }
+
   @GetMapping("/previews")
   public List<EventPreviewDTO> getUserEventsPreview(@RequestHeader("userId") String userId,
       @RequestParam(value = "from", required = false) String from, @RequestParam(value = "to", required = false) String to) {
@@ -53,9 +60,9 @@ public class EventController {
   }
 
   @GetMapping("/{id}")
-  public EventDTO getEventInfo(@PathVariable("id") String id) {
+  public EventDTO getEventInfo(@PathVariable("id") String id, @RequestHeader("userId") String userId) {
 
-    return eventService.findFullEventInfo(id);
+    return eventService.findFullEventInfo(id, userId);
   }
 
   @PostMapping("/{id}/members/invite")
@@ -70,7 +77,7 @@ public class EventController {
     eventService.deleteMemberEvent(eventId, memberId);
   }
 
-  @PostMapping("/email-invitation/decline")
+  @GetMapping("/email-invitation/decline")
   public String declineInvitation(@RequestParam("eventId") String eventId,
       @RequestParam("code") String code,
       @RequestParam("time") String time,
@@ -79,7 +86,7 @@ public class EventController {
     return eventService.declineEventEmailInvitation(eventId, code, time, email);
   }
 
-  @PostMapping("/email-invitation/accept")
+  @GetMapping("/email-invitation/accept")
   public String acceptInvitation(@RequestParam("eventId") String eventId,
       @RequestParam("code") String code,
       @RequestParam("time") String time,

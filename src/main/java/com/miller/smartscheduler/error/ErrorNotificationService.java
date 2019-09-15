@@ -24,8 +24,8 @@ public class ErrorNotificationService {
 
   public void sendErrorReport(AndroidErrorReport androidErrorReport) {
 
-    MimeMessagePreparator messagePreparator = buildMailMessage(androidErrorReport);
-    mailSender.send(messagePreparator);
+    //MimeMessagePreparator messagePreparator = buildMailMessage(androidErrorReport);
+    //mailSender.send(messagePreparator);
   }
 
   private MimeMessagePreparator buildMailMessage(AndroidErrorReport androidErrorReport) {
